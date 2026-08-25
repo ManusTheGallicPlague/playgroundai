@@ -1,2 +1,1 @@
-# Sostituisci pub-0000000000000000 con il tuo Publisher ID di AdSense
-google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0
+google.com, pub-3368917580765134, DIRECT, f08c47fec0942fa0
