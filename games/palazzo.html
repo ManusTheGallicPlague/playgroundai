@@ -120,6 +120,8 @@ button:focus-visible{outline:2px solid var(--wine);outline-offset:3px}
   text-decoration:none;backdrop-filter:blur(6px)}
 .pgai-back:hover{background:rgba(70,80,120,.85)}
 
+
+html,body{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 </style>
 
 <div class="head">
@@ -388,4 +390,5 @@ addEventListener('keydown',e=>{ if(e.code==='KeyM')muted=!muted });
 })();
 </script>
 
+<script>document.addEventListener("contextmenu",function(e){if(e.target&&e.target.tagName==="CANVAS")e.preventDefault()});</script>
 <a class="pgai-back" href="../index.html" aria-label="Torna a PlaygroundAI">&#9666; PlaygroundAI</a>

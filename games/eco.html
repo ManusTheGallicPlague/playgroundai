@@ -95,6 +95,8 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
   text-decoration:none;backdrop-filter:blur(6px)}
 .pgai-back:hover{background:rgba(70,80,120,.85)}
 
+
+html,body{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 </style>
 
 <div class="head">
@@ -505,7 +507,7 @@ function r_rect(x,y,w,h,r){
 /* ---------- input ---------- */
 function toW(ev){ const r=cv.getBoundingClientRect();
   return {x:(ev.clientX-r.left)/r.width*VW,y:(ev.clientY-r.top)/r.height*VH}; }
-addEventListener('pointermove',ev=>{mouse=toW(ev)});
+addEventListener('pointermove',ev=>{mouse=toW(ev);if(ev.pointerType==="touch")mouse.y-=44});
 addEventListener('keydown',e=>{ if(e.code==='KeyM')muted=!muted });
 $('btnStart').addEventListener('click',()=>{$('ovMenu').classList.add('hide');startRun()});
 $('btnAgain').addEventListener('click',()=>{$('ovOver').classList.add('hide');startRun()});
@@ -519,11 +521,12 @@ let reported=false;
 })();
 </script>
 
+<script>document.addEventListener("contextmenu",function(e){if(e.target&&e.target.tagName==="CANVAS")e.preventDefault()});</script>
 <a class="pgai-back" href="../index.html" aria-label="Torna a PlaygroundAI">&#9666; PlaygroundAI</a>
 
 <script>
 document.addEventListener("pointerdown",function(e){
   try{window.dispatchEvent(new PointerEvent("pointermove",
-    {clientX:e.clientX,clientY:e.clientY,bubbles:true}))}catch(_){}
+    {clientX:e.clientX,clientY:e.clientY,bubbles:true,pointerType:e.pointerType}))}catch(_){}
 },true);
 </script>

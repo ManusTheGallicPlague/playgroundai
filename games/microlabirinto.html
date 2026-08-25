@@ -52,13 +52,15 @@ button:focus-visible{outline:1px solid #8a8fa0;outline-offset:3px}
   text-decoration:none;backdrop-filter:blur(6px)}
 .pgai-back:hover{background:rgba(70,80,120,.85)}
 
+
+html,body{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 </style>
 
 <div class="stage" id="stage">
   <canvas id="cv" width="1000" height="640"></canvas>
   <div class="hud" id="hud">livello 1/3 · tentativi 0</div>
   <div class="taunt" id="taunt">—</div>
-  <div class="hint">se non lo vedi bene, avvicinati (o pizzica per lo zoom).</div>
+  <div class="hint">se non lo vedi bene, avvicinati (o pizzica per lo zoom) · su telefono il puntino fluttua sopra il dito.</div>
 
   <div class="ov" id="ovIntro">
     <h2>Microlabirinto</h2>
@@ -253,7 +255,8 @@ function draw(){
 /* ---------- input ---------- */
 addEventListener('pointermove',ev=>{
   const r=cv.getBoundingClientRect();
-  mouse={x:(ev.clientX-r.left)/r.width*VW,y:(ev.clientY-r.top)/r.height*VH};
+  const ty=(ev.pointerType==="touch")?-56:0;
+  mouse={x:(ev.clientX-r.left)/r.width*VW,y:(ev.clientY+ty-r.top)/r.height*VH};
 });
 addEventListener('keydown',e=>{ if(e.code==='KeyM')muted=!muted });
 $('btnGo').addEventListener('click',()=>{
@@ -277,11 +280,12 @@ let reported=false;
 })();
 </script>
 
+<script>document.addEventListener("contextmenu",function(e){if(e.target&&e.target.tagName==="CANVAS")e.preventDefault()});</script>
 <a class="pgai-back" href="../index.html" aria-label="Torna a PlaygroundAI">&#9666; PlaygroundAI</a>
 
 <script>
 document.addEventListener("pointerdown",function(e){
   try{window.dispatchEvent(new PointerEvent("pointermove",
-    {clientX:e.clientX,clientY:e.clientY,bubbles:true}))}catch(_){}
+    {clientX:e.clientX,clientY:e.clientY,bubbles:true,pointerType:e.pointerType}))}catch(_){}
 },true);
 </script>
