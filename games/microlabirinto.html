@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="it">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Il labirinto minuscolo per mani fermissime. Non toccare i bordi. Gioca gratis su PlaygroundAI.">
+<meta name="theme-color" content="#0a0d18">
+<title>Microlabirinto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Manrope:wght@500;700&display=swap">
+
+<style>
+:root{--bg:#07080c;--ink:#4a4f5e;--faint:#2a2e3a;--go:#3f6a4a;--end:#6a5a2e;--red:#8e3a34}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:"Space Mono",monospace;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;cursor:default;
+}
+.stage{position:relative;width:min(1000px,98vw);height:min(92vh,640px)}
+canvas{display:block;width:100%;height:100%}
+.hud{position:absolute;top:14px;left:16px;font-size:11px;letter-spacing:1.5px;
+  color:#3a3f4c;user-select:none}
+.hint{position:absolute;bottom:14px;left:0;right:0;text-align:center;
+  font-size:10.5px;letter-spacing:2px;color:#333846;user-select:none}
+.taunt{position:absolute;bottom:38px;left:0;right:0;text-align:center;
+  font-size:10px;color:#4a3a3a;opacity:0;transition:opacity .4s;user-select:none}
+.taunt.on{opacity:1}
+
+.ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:16px;text-align:center;padding:30px;background:#07080cfa;z-index:5}
+.ov.hide{display:none}
+.ov h2{font-family:"Manrope",sans-serif;font-weight:700;font-size:clamp(20px,3vw,30px);
+  color:#8a8fa0;line-height:1.3;text-wrap:balance}
+.ov p{max-width:48ch;font-size:12.5px;line-height:1.8;color:#565b6a;font-family:"Manrope",sans-serif}
+.ov .stat{font-size:13px;color:#8a8fa0}
+button{font-family:"Space Mono",monospace;font-weight:700;font-size:12px;letter-spacing:2px;
+  padding:12px 28px;border:1px solid #3a3f4c;border-radius:3px;cursor:pointer;
+  background:transparent;color:#8a8fa0;transition:border-color .2s,color .2s}
+button:hover{border-color:#8a8fa0;color:#c9cede}
+button:focus-visible{outline:1px solid #8a8fa0;outline-offset:3px}
+
+@media (pointer:coarse){
+  .hint{font-size:11px}
+}
+.pgai-back{position:fixed;bottom:12px;right:12px;z-index:999;font-family:system-ui,sans-serif;
+  font-weight:700;font-size:12px;color:#fff;background:rgba(15,17,28,.78);
+  border:1px solid rgba(255,255,255,.28);padding:8px 13px;border-radius:99px;
+  text-decoration:none;backdrop-filter:blur(6px)}
+.pgai-back:hover{background:rgba(70,80,120,.85)}
+
+</style>
+
+<div class="stage" id="stage">
+  <canvas id="cv" width="1000" height="640"></canvas>
+  <div class="hud" id="hud">livello 1/3 · tentativi 0</div>
+  <div class="taunt" id="taunt">—</div>
+  <div class="hint">se non lo vedi bene, avvicinati (o pizzica per lo zoom).</div>
+
+  <div class="ov" id="ovIntro">
+    <h2>Microlabirinto</h2>
+    <p>Porta il puntino dal quadrato <b style="color:#5a9a6a">verde</b> a quello <b style="color:#b09a4e">oro</b> muovendo il mouse, senza mai toccare i bordi. Un tocco e ricominci il livello.<br><br>Tre livelli. Ogni livello è più piccolo e più scuro del precedente. Serve una mano fermissima — e servono i tuoi occhi molto, molto vicini allo schermo.</p>
+    <button id="btnGo">ho la mano ferma</button>
+  </div>
+
+  <div class="ov hide" id="ovWin">
+    <h2 id="wT">Hai vinto.</h2>
+    <p id="wTxt">—</p>
+    <div class="stat" id="wStat">—</div>
+    <button id="btnAgain">di nuovo (perché?)</button>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const cv=$('cv'), ctx=cv.getContext('2d');
+const VW=1000, VH=640, CX=VW/2, CY=VH/2;
+
+/* ---------- audio ---------- */
+let ac=null,muted=false;
+function tone(f,d,type,v,to){
+  if(muted||!ac)return;
+  const t=ac.currentTime,o=ac.createOscillator(),g=ac.createGain();
+  o.type=type||'sine';o.frequency.setValueAtTime(f,t);
+  if(to)o.frequency.exponentialRampToValueAtTime(Math.max(30,to),t+d);
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(v||0.04,t+0.008);
+  g.gain.exponentialRampToValueAtTime(0.0006,t+d);
+  o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+d+0.05);
+}
+const sFail=()=>tone(160,0.22,'sine',0.035,80);
+const sLvl=()=>[660,880].forEach((f,k)=>setTimeout(()=>tone(f,0.18,'triangle',0.045),k*90));
+function sScream(){
+  if(muted||!ac)return;
+  const t=ac.currentTime;
+  tone(85,1.1,'sawtooth',0.24,42);
+  tone(1500,1.0,'sawtooth',0.13,160);
+  tone(650,1.0,'square',0.11,80);
+  const n=ac.sampleRate,buf=ac.createBuffer(1,n,ac.sampleRate),d=buf.getChannelData(0);
+  for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*(1-i/n);
+  const src=ac.createBufferSource();src.buffer=buf;
+  const g=ac.createGain();g.gain.setValueAtTime(0.32,t);
+  g.gain.exponentialRampToValueAtTime(0.001,t+1.1);
+  src.connect(g);g.connect(ac.destination);src.start(t);src.stop(t+1.1);
+}
+
+/* ---------- labirinti ----------
+   pts in coordinate 0..100 · w = larghezza corridoio · size = lato in px */
+const LEVELS=[
+ {size:280, w:9,   dim:1.0,
+  pts:[[10,90],[10,20],[45,20],[45,75],[75,75],[75,10],[90,10]]},
+ {size:220, w:6.5, dim:0.72,
+  pts:[[8,92],[8,15],[30,15],[30,80],[52,80],[52,15],[74,15],[74,80],[92,80]]},
+ {size:172, w:5,   dim:0.5,
+  pts:[[6,94],[6,10],[22,10],[22,85],[38,85],[38,10],[56,10],[56,85],[72,85],[72,10],[94,10],[94,50]]}
+];
+function buildRects(L){
+  const s=L.size/100, ox=CX-L.size/2, oy=CY-L.size/2, hw=L.w/2*s;
+  const R=[];
+  for(let i=0;i<L.pts.length-1;i++){
+    const [x1,y1]=L.pts[i],[x2,y2]=L.pts[i+1];
+    const ax=ox+Math.min(x1,x2)*s-hw, ay=oy+Math.min(y1,y2)*s-hw;
+    const bx=ox+Math.max(x1,x2)*s+hw, by=oy+Math.max(y1,y2)*s+hw;
+    R.push({x:ax,y:ay,w:bx-ax,h:by-ay});
+  }
+  const st=L.pts[0], en=L.pts[L.pts.length-1], k=hw*2.1;
+  return {R,
+    start:{x:ox+st[0]*s-k,y:oy+st[1]*s-k,w:k*2,h:k*2},
+    end:{x:ox+en[0]*s-k,y:oy+en[1]*s-k,w:k*2,h:k*2}};
+}
+const inRect=(p,r)=>p.x>=r.x&&p.x<=r.x+r.w&&p.y>=r.y&&p.y<=r.y+r.h;
+const inPath=(p,B)=>B.R.some(r=>inRect(p,r))||inRect(p,B.start)||inRect(p,B.end);
+
+/* ---------- stato ---------- */
+const G={state:'menu',lvl:0,tries:0,armed:false,t0:0,scareT:0,shake:0};
+let B=null, mouse={x:-99,y:-99};
+const TAUNTS=['di nuovo.','che mira.','il muro non si sposta.','respira.',
+  'era il bordo.','manca poco, dicevi.','fermo il polso.'];
+function taunt(){
+  const e=$('taunt');e.textContent=TAUNTS[(Math.random()*TAUNTS.length)|0];
+  e.classList.add('on');clearTimeout(taunt._t);
+  taunt._t=setTimeout(()=>e.classList.remove('on'),2200);
+}
+function loadLvl(i){
+  G.lvl=i;B=buildRects(LEVELS[i]);G.armed=false;
+  hud();
+}
+function hud(){$('hud').textContent='livello '+(G.lvl+1)+'/3 · tentativi '+G.tries}
+
+/* ---------- logica ---------- */
+function update(){
+  if(G.shake>0)G.shake--;
+  if(G.state==='scare'){
+    G.scareT+=1/60;G.shake=Math.max(G.shake,13);
+    if(G.scareT>1.35){
+      G.state='won';
+      const t=((performance.now()-G.t0)/1000).toFixed(1);
+      $('wT').textContent='Hai vinto. E sei saltato dalla sedia.';
+      $('wTxt').textContent='Il premio del Microlabirinto era la paura, ed è stato consegnato con successo. Complimenti per la mano ferma — e condoglianze al tuo battito cardiaco.';
+      $('wStat').textContent=G.tries+' tentativi · '+t+' secondi';
+      $('ovWin').classList.remove('hide');
+    }
+    return;
+  }
+  if(G.state!=='play')return;
+  const p=mouse;
+  if(!G.armed){
+    if(inRect(p,B.start))G.armed=true;
+    return;
+  }
+  if(inRect(p,B.end)){
+    if(G.lvl>=LEVELS.length-1){
+      G.state='scare';G.scareT=0;sScream();G.shake=24;
+    }else{
+      sLvl();loadLvl(G.lvl+1);
+    }
+    return;
+  }
+  if(!inPath(p,B)){
+    G.tries++;hud();sFail();taunt();G.armed=false;
+    G.flash=8;
+  }
+}
+
+/* ---------- disegno ---------- */
+function draw(){
+  ctx.save();
+  if(G.shake>0)ctx.translate((Math.random()-.5)*G.shake,(Math.random()-.5)*G.shake);
+  ctx.fillStyle='#07080c';ctx.fillRect(0,0,VW,VH);
+
+  if(G.state==='play'||G.state==='menu'){
+    const L=LEVELS[G.lvl], dim=L.dim;
+    if(G.flash>0)G.flash--;
+    // corridoi, appena percettibili
+    for(const r of B.R){
+      ctx.fillStyle=G.flash>0?'rgba(142,58,52,.5)':'rgba(38,42,56,'+(0.55*dim+0.12)+')';
+      ctx.fillRect(r.x,r.y,r.w,r.h);
+    }
+    for(const r of B.R){
+      ctx.strokeStyle='rgba(58,64,84,'+(0.5*dim+0.1)+')';
+      ctx.lineWidth=1;ctx.strokeRect(r.x+.5,r.y+.5,r.w-1,r.h-1);
+    }
+    // partenza e arrivo
+    const pu=0.5+Math.sin(performance.now()/400)*0.2;
+    ctx.fillStyle='rgba(63,106,74,'+((G.armed?0.25:pu)*dim+0.1)+')';
+    ctx.fillRect(B.start.x,B.start.y,B.start.w,B.start.h);
+    ctx.fillStyle='rgba(106,90,46,'+(0.5*dim+0.12)+')';
+    ctx.fillRect(B.end.x,B.end.y,B.end.w,B.end.h);
+    // puntino
+    if(G.state==='play'&&mouse.x>0){
+      ctx.fillStyle=G.armed?'rgba(200,140,70,'+(0.55*dim+0.25)+')':'rgba(120,126,140,.4)';
+      ctx.beginPath();ctx.arc(mouse.x,mouse.y,G.armed?2.6:3.2,0,6.283);ctx.fill();
+    }
+    // vignetta pesante: il buio intorno costringe ad avvicinarsi
+    const vg=ctx.createRadialGradient(CX,CY,L.size*0.35,CX,CY,L.size*1.6);
+    vg.addColorStop(0,'rgba(7,8,12,0)');vg.addColorStop(1,'rgba(7,8,12,.96)');
+    ctx.fillStyle=vg;ctx.fillRect(0,0,VW,VH);
+  }
+
+  if(G.state==='scare'){
+    const k=Math.min(1,G.scareT/0.22);
+    ctx.fillStyle='#000';ctx.fillRect(0,0,VW,VH);
+    ctx.save();
+    ctx.translate(CX+(Math.random()-.5)*26,CY+(Math.random()-.5)*26);
+    ctx.scale(0.5+k*1.25,0.5+k*1.25);
+    // volto pallido
+    ctx.fillStyle='#ddd6cf';
+    ctx.beginPath();ctx.ellipse(0,-10,150,195,0,0,6.283);ctx.fill();
+    ctx.fillStyle='rgba(120,105,95,.5)';
+    ctx.beginPath();ctx.ellipse(0,60,95,120,0,0,6.283);ctx.fill();
+    // occhi vuoti
+    ctx.fillStyle='#0a0806';
+    ctx.beginPath();ctx.ellipse(-58,-70,36,52+Math.random()*10,0.12,0,6.283);ctx.fill();
+    ctx.beginPath();ctx.ellipse(58,-70,36,52+Math.random()*10,-0.12,0,6.283);ctx.fill();
+    ctx.fillStyle='#8e1f1a';
+    ctx.beginPath();ctx.arc(-58,-58,9,0,6.283);ctx.fill();
+    ctx.beginPath();ctx.arc(58,-58,9,0,6.283);ctx.fill();
+    // bocca spalancata
+    ctx.fillStyle='#0a0806';
+    ctx.beginPath();ctx.ellipse(0,95,62,95+Math.random()*12,0,0,6.283);ctx.fill();
+    ctx.strokeStyle='#8e6a5a';ctx.lineWidth=4;
+    ctx.beginPath();ctx.ellipse(0,95,62,95,0,0,6.283);ctx.stroke();
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
+/* ---------- input ---------- */
+addEventListener('pointermove',ev=>{
+  const r=cv.getBoundingClientRect();
+  mouse={x:(ev.clientX-r.left)/r.width*VW,y:(ev.clientY-r.top)/r.height*VH};
+});
+addEventListener('keydown',e=>{ if(e.code==='KeyM')muted=!muted });
+$('btnGo').addEventListener('click',()=>{
+  ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+  if(ac.state==='suspended')ac.resume();
+  $('ovIntro').classList.add('hide');
+  G.state='play';G.tries=0;G.t0=performance.now();loadLvl(0);
+});
+$('btnAgain').addEventListener('click',()=>{
+  $('ovWin').classList.add('hide');
+  G.state='play';G.tries=0;G.t0=performance.now();loadLvl(0);
+});
+
+loadLvl(0);
+let reported=false;
+(function loop(){
+  try{ update(); draw(); }
+  catch(err){ if(!reported){reported=true;console.error(err)} }
+  requestAnimationFrame(loop);
+})();
+})();
+</script>
+
+<a class="pgai-back" href="../index.html" aria-label="Torna a PlaygroundAI">&#9666; PlaygroundAI</a>
+
+<script>
+document.addEventListener("pointerdown",function(e){
+  try{window.dispatchEvent(new PointerEvent("pointermove",
+    {clientX:e.clientX,clientY:e.clientY,bubbles:true}))}catch(_){}
+},true);
+</script>

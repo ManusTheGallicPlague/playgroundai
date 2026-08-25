@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="30 secondi di tap frenetico: emoji, combo e SIGMA MODE. Gioca gratis su PlaygroundAI.">
+<title>SKIBIDI RIZZ TAPPER 9000</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --hot:#ff2fb9; --acid:#c6ff00; --cyan:#00f0ff; --pur:#8b00ff; --ink:#08000f;
+  }
+  html,body{height:100%}
+  body{
+    font-family:"Impact","Haettenschweiler","Arial Black",system-ui,sans-serif;
+    background:var(--ink); color:#fff; overflow:hidden;
+    -webkit-user-select:none; user-select:none; cursor:crosshair;
+  }
+  #bg{position:fixed;inset:0;z-index:0;
+    background:
+      radial-gradient(circle at 20% 20%, #ff2fb955, transparent 45%),
+      radial-gradient(circle at 80% 30%, #00f0ff55, transparent 45%),
+      radial-gradient(circle at 50% 85%, #c6ff0055, transparent 45%),
+      repeating-linear-gradient(45deg,#12002a 0 22px,#1b0038 22px 44px);
+    animation:hue 6s linear infinite;
+  }
+  @keyframes hue{to{filter:hue-rotate(360deg)}}
+  #scan{position:fixed;inset:0;z-index:6;pointer-events:none;
+    background:repeating-linear-gradient(0deg,#0000 0 2px,#00000055 2px 4px);mix-blend-mode:overlay}
+  .wrap{position:relative;z-index:2;height:100%;display:flex;flex-direction:column}
+
+  header{padding:8px 14px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;
+    background:#00000066;border-bottom:4px solid var(--acid)}
+  h1{font-size:clamp(20px,3.4vw,38px);letter-spacing:1px;line-height:1;
+    background:linear-gradient(90deg,var(--hot),var(--acid),var(--cyan),var(--hot));
+    background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:slide 2.5s linear infinite;text-shadow:0 0 22px #ff2fb977}
+  @keyframes slide{to{background-position:300% 0}}
+  .stat{font-size:clamp(13px,1.5vw,18px);padding:5px 11px;border:3px solid #fff;border-radius:10px;
+    background:#000000aa;white-space:nowrap}
+  .stat b{color:var(--acid)}
+  #timer.low{color:#ff3b3b;animation:blink .35s steps(2) infinite}
+  @keyframes blink{50%{opacity:.25}}
+
+  #marquee{background:var(--hot);color:#000;font-size:15px;padding:3px 0;white-space:nowrap;overflow:hidden}
+  #marquee span{display:inline-block;padding-left:100%;animation:mq 16s linear infinite}
+  @keyframes mq{to{transform:translateX(-100%)}}
+
+  #arena{position:relative;flex:1;overflow:hidden}
+  .targ{position:absolute;font-size:56px;line-height:1;cursor:pointer;
+    filter:drop-shadow(0 0 12px #fff);animation:pop .18s ease-out, bob 1.1s ease-in-out infinite}
+  @keyframes pop{from{transform:scale(0) rotate(-90deg)}to{transform:scale(1) rotate(0)}}
+  @keyframes bob{50%{transform:translateY(-12px) rotate(8deg)}}
+  .targ.bad{filter:drop-shadow(0 0 14px #ff0044)}
+  .float{position:absolute;font-size:30px;pointer-events:none;animation:up .8s ease-out forwards;z-index:5}
+  @keyframes up{to{transform:translateY(-90px) scale(1.5);opacity:0}}
+  .phrase{position:absolute;font-size:clamp(26px,5vw,64px);pointer-events:none;opacity:.9;
+    color:var(--acid);text-shadow:3px 3px 0 var(--hot);animation:ph 1.1s ease-out forwards;z-index:4}
+  @keyframes ph{0%{transform:scale(.3) rotate(-14deg)}70%{transform:scale(1.15) rotate(6deg)}100%{opacity:0;transform:scale(1.6)}}
+
+  #meterBox{padding:6px 14px;background:#00000088;border-top:4px solid var(--cyan)}
+  #meterOut{height:22px;border:3px solid #fff;border-radius:99px;overflow:hidden;background:#000}
+  #meterIn{height:100%;width:0;border-radius:99px;
+    background:linear-gradient(90deg,var(--cyan),var(--acid),var(--hot));transition:width .15s}
+  #meterTxt{font-size:13px;letter-spacing:2px;margin-top:3px;color:var(--cyan)}
+
+  .screen{position:absolute;inset:0;z-index:9;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:16px;text-align:center;padding:20px;
+    background:#08000fdd;backdrop-filter:blur(4px)}
+  .screen.hide{display:none}
+  .big{font-size:clamp(32px,7vw,86px);line-height:.95;
+    background:linear-gradient(90deg,var(--acid),var(--hot),var(--cyan));background-size:300% 100%;
+    -webkit-background-clip:text;background-clip:text;color:transparent;animation:slide 2s linear infinite}
+  .sub{font-family:system-ui,sans-serif;font-weight:700;font-size:clamp(14px,1.9vw,20px);
+    max-width:640px;line-height:1.5;color:#ffe9ff}
+  button{font-family:inherit;font-size:clamp(20px,3vw,34px);padding:14px 34px;border:5px solid #000;
+    border-radius:16px;cursor:pointer;background:var(--acid);color:#000;letter-spacing:2px;
+    box-shadow:0 8px 0 #000,0 0 34px var(--acid);transition:transform .08s}
+  button:hover{transform:translateY(-3px) rotate(-1.5deg)}
+  button:active{transform:translateY(5px);box-shadow:0 2px 0 #000}
+  .rank{font-size:clamp(24px,4.4vw,50px);color:var(--acid);text-shadow:3px 3px 0 var(--hot)}
+  .hs{font-family:system-ui,sans-serif;font-size:16px;color:var(--cyan);font-weight:700}
+  .shake{animation:sh .3s}
+  @keyframes sh{25%{transform:translate(7px,-5px)}50%{transform:translate(-8px,4px)}75%{transform:translate(5px,6px)}}
+  .sigma #bg{animation:hue 1s linear infinite}
+  .sigma .wrap{animation:sh .5s infinite}
+  .tip{font-family:system-ui,sans-serif;font-size:13px;color:#c9a7ff}
+
+.pgai-back{position:fixed;bottom:12px;right:12px;z-index:999;font-family:system-ui,sans-serif;
+  font-weight:700;font-size:12px;color:#fff;background:rgba(15,17,28,.78);
+  border:1px solid rgba(255,255,255,.28);padding:8px 13px;border-radius:99px;
+  text-decoration:none;backdrop-filter:blur(6px)}
+.pgai-back:hover{background:rgba(70,80,120,.85)}
+
+</style>
+</head>
+<body>
+<div id="bg"></div><div id="scan"></div>
+
+<div class="wrap">
+  <header>
+    <h1>💀 SKIBIDI RIZZ TAPPER 9000 💀</h1>
+    <div class="stat">PUNTI <b id="score">0</b></div>
+    <div class="stat">COMBO <b id="combo">x1</b></div>
+    <div class="stat">TEMPO <b id="timer">30</b></div>
+    <div class="stat">RECORD <b id="best">0</b></div>
+  </header>
+
+  <div id="marquee"><span>🚽 SKIBIDI TOILET ‧ OHIO RIZZ ‧ GYATT ‧ SIGMA GRINDSET ‧ FANUM TAX ‧ MEWING ‧ NPC MODE ‧ CHE BRAINROT FRATM ‧ IL FRA È SIGMA ‧ CARICA IL MOGGING ‧ 67 ‧ TRALALERO TRALALA ‧ BOMBARDIRO CROCODILO ‧ NON È MICA UN GIOCO... ANZI SÌ ‧ </span></div>
+
+  <div id="arena">
+    <div class="screen" id="start">
+      <div class="big">TAPPA<br>TUTTO</div>
+      <div class="sub">Clicca gli emoji buoni per fare punti. <b style="color:#ff2fb9">EVITA I TESCHI 💀</b>: ti azzerano la combo e ti tolgono punti.<br>Riempi la barra RIZZ e scatta la <b style="color:#c6ff00">SIGMA MODE</b> (punti doppi).</div>
+      <button id="go">START 🔥</button>
+      <div class="tip">Hai 30 secondi. Il record resta salvato su questo PC.</div>
+    </div>
+
+    <div class="screen hide" id="end">
+      <div class="big" id="endTitle">FINITO</div>
+      <div class="rank" id="rank"></div>
+      <div class="sub" id="endMsg"></div>
+      <div class="hs" id="hsLine"></div>
+      <button id="again">ANCORA 🔁</button>
+    </div>
+  </div>
+
+  <div id="meterBox">
+    <div id="meterOut"><div id="meterIn"></div></div>
+    <div id="meterTxt">RIZZ METER — riempilo per la SIGMA MODE</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  const arena=$('arena'), body=document.body;
+  const GOOD=['🗿','🔥','😎','💅','🤑','🦧','🐊','🚽','🧿','👽','🍕','🤙'];
+  const BAD=['💀'];
+  const PHRASES=['SKIBIDI!','GYATT','OHIO 💀','SIGMA','RIZZ +100','FANUM TAX','MOGGED','NPC','BRAINROT','TRALALERO','67','MEWING'];
+  const RANKS=[[0,'NPC ASSOLUTO 🧍'],[300,'BETA CON POTENZIALE 🫠'],[700,'RIZZLER IN ERBA 😏'],[1200,'GYATT HUNTER 🔥'],[1800,'SIGMA CERTIFICATO 🗿'],[2600,'OHIO FINAL BOSS 👑']];
+
+  let score=0, combo=1, time=30, rizz=0, sigma=false, running=false;
+  let spawnT=null, tickT=null, sigmaT=null;
+  let best=+(localStorage.getItem('skibidiBest')||0);
+  $('best').textContent=best;
+
+  // suoni sintetici, niente file esterni
+  let ac=null;
+  function beep(freq,dur,type){
+    try{
+      ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+      const o=ac.createOscillator(), g=ac.createGain();
+      o.type=type||'square'; o.frequency.value=freq;
+      g.gain.setValueAtTime(.18,ac.currentTime);
+      g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+dur);
+      o.connect(g); g.connect(ac.destination); o.start(); o.stop(ac.currentTime+dur);
+    }catch(e){}
+  }
+
+  function floatTxt(x,y,txt,color){
+    const d=document.createElement('div');
+    d.className='float'; d.textContent=txt; d.style.left=x+'px'; d.style.top=y+'px';
+    d.style.color=color||'#c6ff00';
+    arena.appendChild(d); setTimeout(()=>d.remove(),800);
+  }
+  function phrase(){
+    const p=document.createElement('div');
+    p.className='phrase'; p.textContent=PHRASES[(Math.random()*PHRASES.length)|0];
+    p.style.left=(10+Math.random()*60)+'%'; p.style.top=(15+Math.random()*60)+'%';
+    p.style.transform='rotate('+(Math.random()*30-15)+'deg)';
+    arena.appendChild(p); setTimeout(()=>p.remove(),1100);
+  }
+  function shake(){ body.classList.add('shake'); setTimeout(()=>body.classList.remove('shake'),300); }
+
+  function setRizz(v){
+    rizz=Math.max(0,Math.min(100,v));
+    $('meterIn').style.width=rizz+'%';
+    if(rizz>=100 && !sigma) goSigma();
+  }
+  function goSigma(){
+    sigma=true; body.classList.add('sigma');
+    $('meterTxt').textContent='⚡ SIGMA MODE ATTIVA — PUNTI DOPPI ⚡';
+    beep(880,.15); setTimeout(()=>beep(1320,.2),120);
+    clearTimeout(sigmaT);
+    sigmaT=setTimeout(()=>{
+      sigma=false; body.classList.remove('sigma'); setRizz(0);
+      $('meterTxt').textContent='RIZZ METER — riempilo per la SIGMA MODE';
+    },6000);
+  }
+
+  function spawn(){
+    if(!running) return;
+    const bad=Math.random()<0.22;
+    const el=document.createElement('div');
+    el.className='targ'+(bad?' bad':'');
+    el.textContent = bad ? BAD[0] : GOOD[(Math.random()*GOOD.length)|0];
+    const w=arena.clientWidth-90, h=arena.clientHeight-90;
+    el.style.left=(20+Math.random()*Math.max(10,w))+'px';
+    el.style.top=(20+Math.random()*Math.max(10,h))+'px';
+    el.style.fontSize=(42+Math.random()*34)+'px';
+
+    const life=setTimeout(()=>{ if(el.isConnected){ el.remove(); if(!bad){ combo=1; $('combo').textContent='x1'; } } }, bad?1400:1150);
+
+    el.addEventListener('pointerdown',ev=>{
+      ev.preventDefault(); clearTimeout(life);
+      const r=el.getBoundingClientRect(), ar=arena.getBoundingClientRect();
+      const x=r.left-ar.left, y=r.top-ar.top;
+      if(bad){
+        score=Math.max(0,score-120); combo=1; setRizz(rizz-30);
+        floatTxt(x,y,'-120 💀','#ff3b3b'); shake(); beep(110,.28,'sawtooth');
+      }else{
+        const gain=(50*combo)*(sigma?2:1);
+        score+=gain; combo=Math.min(combo+1,12); setRizz(rizz+9);
+        floatTxt(x,y,'+'+gain,sigma?'#00f0ff':'#c6ff00');
+        beep(420+combo*55,.09);
+        if(combo%4===0) phrase();
+      }
+      $('score').textContent=score; $('combo').textContent='x'+combo;
+      el.remove();
+    });
+
+    arena.appendChild(el);
+    spawnT=setTimeout(spawn, sigma?230:(320+Math.random()*380));
+  }
+
+  function tick(){
+    time--; $('timer').textContent=time;
+    $('timer').classList.toggle('low',time<=5);
+    if(time<=0){ stop(); return; }
+    tickT=setTimeout(tick,1000);
+  }
+
+  function start(){
+    score=0;combo=1;time=30;sigma=false;
+    $('score').textContent=0; $('combo').textContent='x1'; $('timer').textContent=30;
+    $('timer').classList.remove('low'); body.classList.remove('sigma');
+    setRizz(0); $('meterTxt').textContent='RIZZ METER — riempilo per la SIGMA MODE';
+    document.querySelectorAll('.targ').forEach(t=>t.remove());
+    $('start').classList.add('hide'); $('end').classList.add('hide');
+    running=true; beep(660,.12); spawn(); tickT=setTimeout(tick,1000);
+  }
+
+  function stop(){
+    running=false; clearTimeout(spawnT); clearTimeout(tickT); clearTimeout(sigmaT);
+    body.classList.remove('sigma');
+    document.querySelectorAll('.targ').forEach(t=>t.remove());
+    let r=RANKS[0][1];
+    for(const [th,name] of RANKS) if(score>=th) r=name;
+    $('rank').textContent=r;
+    const isNew=score>best;
+    if(isNew){ best=score; localStorage.setItem('skibidiBest',best); $('best').textContent=best; }
+    $('endTitle').textContent = isNew ? 'NUOVO RECORD 🏆' : 'TEMPO SCADUTO';
+    $('endMsg').innerHTML = 'Hai fatto <b style="color:#c6ff00">'+score+'</b> punti.' +
+      (isNew ? ' Sei ufficialmente il più sigma di questo PC.' : ' Il record resta <b>'+best+'</b>. Riprova, non essere un NPC.');
+    $('hsLine').textContent='RECORD SU QUESTO PC: '+best;
+    $('end').classList.remove('hide');
+    beep(220,.35,'triangle');
+  }
+
+  $('go').addEventListener('click',start);
+  $('again').addEventListener('click',start);
+  window.addEventListener('keydown',e=>{ if(e.code==='Space' && !running){ e.preventDefault(); start(); }});
+})();
+</script>
+
+<a class="pgai-back" href="../index.html" aria-label="Torna a PlaygroundAI">&#9666; PlaygroundAI</a>
+</body>
+</html>

@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="it">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Scala la torre, cadi, ricomincia. Nessun checkpoint: rage puro. Gioca gratis su PlaygroundAI.">
+<meta name="theme-color" content="#0a0d18">
+<title>Torre di Sisifo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Spectral:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap">
+
+<style>
+:root{
+  --void:#080a12;        /* cielo alto, quasi nero */
+  --night:#141a2e;       /* notte di tempesta */
+  --stone:#3b4258;       /* pietra della torre */
+  --stone-lo:#252b3d;
+  --moss:#4a5b52;
+  --lantern:#ffb347;     /* unico accento caldo: la lanterna */
+  --moon:#cfd8e8;
+  --paper:#e8e4da;
+  --blood:#a33a3a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:
+    radial-gradient(ellipse at 50% -10%, #1d2540 0%, transparent 60%),
+    var(--void);
+  color:var(--paper);
+  font-family:"Spectral",Georgia,serif;
+  display:flex;align-items:center;justify-content:center;
+  padding:16px;overflow:hidden;
+}
+.room{display:flex;gap:18px;align-items:stretch;max-height:96vh}
+
+/* ---------- colonna sinistra: titolo + statistiche ---------- */
+.side{width:210px;display:flex;flex-direction:column;justify-content:space-between;padding:6px 0}
+.brand h1{
+  font-family:"Cinzel",Georgia,serif;font-weight:800;
+  font-size:30px;line-height:1.05;letter-spacing:1px;color:var(--paper);
+  text-wrap:balance;
+}
+.brand .rule{height:1px;background:linear-gradient(90deg,var(--lantern),transparent);margin:10px 0 9px}
+.brand p{font-size:13.5px;line-height:1.6;color:#9aa3b8;font-style:italic}
+
+.stats{display:flex;flex-direction:column;gap:11px;margin:16px 0}
+.stat{display:flex;align-items:baseline;justify-content:space-between;
+  border-bottom:1px dotted #2b3247;padding-bottom:6px}
+.stat .k{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:1.6px;
+  text-transform:uppercase;color:#6e7794}
+.stat .v{font-family:"IBM Plex Mono",monospace;font-size:19px;font-variant-numeric:tabular-nums;color:var(--paper)}
+.stat .v.hot{color:var(--lantern)}
+.stat .v.bad{color:var(--blood)}
+
+.howto{font-size:12.5px;line-height:1.75;color:#8b93a8}
+.howto b{color:var(--paper);font-weight:600}
+.howto kbd{font-family:"IBM Plex Mono",monospace;font-size:11px;background:#1a2033;
+  border:1px solid #2b3247;border-bottom-width:2px;border-radius:3px;padding:1px 6px;color:var(--paper)}
+
+/* ---------- la torre ---------- */
+.tower{position:relative;display:flex;gap:10px}
+.screen{position:relative;border:1px solid #2b3247;background:#05070d;
+  box-shadow:0 30px 80px #000a,inset 0 0 90px #000}
+canvas{display:block;height:min(88vh,660px);width:auto;image-rendering:pixelated}
+.vig{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 45%,#0000 45%,#000000c9 100%)}
+
+/* altimetro */
+.rail{position:relative;width:26px;border:1px solid #2b3247;background:#0b0f1a;border-radius:2px}
+.rail .fill{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(180deg,#2c3450,transparent)}
+.rail .me{position:absolute;left:-3px;right:-3px;height:2px;background:var(--lantern);
+  box-shadow:0 0 10px var(--lantern)}
+.rail .rec{position:absolute;left:-3px;right:-3px;height:1px;background:var(--moon);opacity:.75}
+.rail .top{position:absolute;top:3px;left:0;right:0;text-align:center;
+  font-family:"IBM Plex Mono",monospace;font-size:8px;color:#5d6684}
+
+/* ---------- overlay ---------- */
+.ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:16px;text-align:center;padding:26px;background:#05070df2}
+.ov.hide{display:none}
+.ov h2{font-family:"Cinzel",serif;font-size:clamp(22px,3.4vw,34px);font-weight:800;
+  letter-spacing:1px;line-height:1.15;text-wrap:balance}
+.ov h2.win{color:var(--lantern)}
+.ov p{max-width:34ch;font-size:14px;line-height:1.7;color:#a6aec2}
+.ov .quote{font-style:italic;color:#7b849c;font-size:13px}
+button{
+  font-family:"Cinzel",serif;font-weight:600;font-size:15px;letter-spacing:2.5px;
+  text-transform:uppercase;padding:12px 26px;cursor:pointer;
+  background:transparent;color:var(--lantern);border:1px solid var(--lantern);border-radius:2px;
+  transition:background .18s,color .18s;
+}
+button:hover{background:var(--lantern);color:#1a1206}
+button:focus-visible{outline:2px solid var(--moon);outline-offset:3px}
+
+.toast{position:absolute;left:50%;top:16%;transform:translateX(-50%);
+  font-family:"Cinzel",serif;font-size:17px;letter-spacing:2px;color:var(--blood);
+  opacity:0;pointer-events:none;text-shadow:0 2px 14px #000}
+.toast.show{animation:sting 1.9s ease-out}
+@keyframes sting{0%{opacity:0;transform:translateX(-50%) translateY(-8px)}
+  12%{opacity:1}70%{opacity:1}100%{opacity:0;transform:translateX(-50%) translateY(10px)}}
+
+@media (max-width:820px){
+  .room{flex-direction:column;align-items:center;gap:10px}
+  .side{width:min(440px,92vw);order:2}
+  .brand p,.howto{display:none}
+  canvas{height:min(66vh,520px)}
+}
+@media (prefers-reduced-motion:reduce){.toast.show{animation-duration:.01ms}}
+
+@media (max-width:820px){
+  body{overflow:auto;height:auto;min-height:100vh;padding:8px}
+  canvas{height:min(72vh,560px)}
+}
+.pgai-back{position:fixed;bottom:12px;right:12px;z-index:999;font-family:system-ui,sans-serif;
+  font-weight:700;font-size:12px;color:#fff;background:rgba(15,17,28,.78);
+  border:1px solid rgba(255,255,255,.28);padding:8px 13px;border-radius:99px;
+  text-decoration:none;backdrop-filter:blur(6px)}
+.pgai-back:hover{background:rgba(70,80,120,.85)}
+
+</style>
+
+<div class="room">
+  <div class="side">
+    <div class="brand">
+      <h1>Torre di Sisifo</h1>
+      <div class="rule"></div>
+      <p>Nessuna morte. Nessun checkpoint. Solo l'altezza che hai guadagnato e la lunga strada per riperderla.</p>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><span class="k">Quota</span><span class="v hot" id="alt">0 m</span></div>
+      <div class="stat"><span class="k">Record</span><span class="v" id="best">0 m</span></div>
+      <div class="stat"><span class="k">Cadute rovinose</span><span class="v bad" id="falls">0</span></div>
+      <div class="stat"><span class="k">Tempo</span><span class="v" id="time">00:00</span></div>
+    </div>
+
+    <div class="howto">
+      <b>Tieni premuto</b> <kbd>Spazio</kbd> (o il mouse) per caricare il salto: più carichi, più vai lontano.<br><br>
+      <b>Mentre carichi</b>, tieni <kbd>←</kbd> o <kbd>→</kbd> per decidere la direzione. In aria non puoi più correggere: il salto è una promessa che non puoi ritirare.<br><br>
+      Sbatti contro un muro e <b>rimbalzi</b>. Il ghiaccio non frena. Le assi marce cedono. <kbd>R</kbd> azzera la partita.
+    </div>
+  </div>
+
+  <div class="tower">
+    <div class="screen" id="screen">
+      <canvas id="cv" width="440" height="620"></canvas>
+      <div class="vig"></div>
+      <div class="toast" id="toast">—</div>
+
+      <div class="ov" id="ovTitle">
+        <h2>Si sale soltanto<br>con la pazienza</h2>
+        <p>Un salto sbagliato può costarti dieci minuti di scalata. Non c'è penalità peggiore, e non ce n'è una più giusta: la torre non bara mai.</p>
+        <button id="btnStart">Comincia a salire</button>
+        <p class="quote">«Bisogna immaginare Sisifo felice.»</p>
+      </div>
+
+      <div class="ov hide" id="ovWin">
+        <h2 class="win">Hai raggiunto la cima</h2>
+        <p id="winTxt">—</p>
+        <button id="btnAgain">Di nuovo</button>
+      </div>
+    </div>
+
+    <div class="rail" id="rail">
+      <div class="rec" id="railRec"></div>
+      <div class="me" id="railMe"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+const W=440, H=620;
+const $=id=>document.getElementById(id);
+
+/* ---------- mondo ---------- */
+const FLOOR=4400;          // y del suolo (si sale verso y piccole)
+const SUMMIT=150;          // quota della vetta
+const M=(y)=>Math.max(0,Math.round((FLOOR-y-24)/22));   // y -> metri
+
+/* tipi: 0 pietra, 1 ghiaccio, 2 asse marcia, 3 mobile */
+function P(x,y,w,t,rng){return {x,y,w,h:12,t:t||0,rng:rng||0,x0:x,ph:Math.random()*6,timer:0,gone:0}}
+const PLATS=[
+  // --- base: si impara la carica ---
+  P(0,FLOOR,W,0),
+  P(60,4290,110,0), P(250,4190,110,0), P(80,4080,100,0), P(270,3975,120,0),
+  P(70,3865,100,0), P(240,3760,90,0),  P(90,3650,90,0),
+  // --- distanze vere, primi rimbalzi ---
+  P(300,3540,80,0), P(40,3435,80,0),   P(300,3330,70,0), P(120,3230,70,0),
+  P(300,3120,90,0), P(60,3015,80,0),
+  // --- ghiaccio ---
+  P(230,2905,110,1), P(50,2800,100,1), P(280,2695,90,1), P(110,2590,80,1),
+  P(300,2480,80,0),
+  // --- assi marce ---
+  P(80,2375,90,2),  P(270,2270,90,2),  P(90,2165,80,2),  P(280,2060,80,0),
+  P(120,1955,70,2), P(300,1850,70,0),
+  // --- vento e piattaforme mobili ---
+  P(60,1740,80,3,90), P(280,1635,70,3,70), P(90,1525,80,3,80),
+  P(290,1420,70,0),  P(70,1315,70,3,100),
+  // --- il collo di bottiglia ---
+  P(200,1205,60,0), P(60,1105,60,0),  P(310,1000,60,1), P(150,890,60,2),
+  P(30,785,60,0),   P(280,680,60,0),  P(140,575,55,3,60),
+  P(320,470,55,0),  P(80,365,55,1),   P(230,265,55,0),
+  // --- vetta ---
+  P(150,SUMMIT,140,0)
+];
+const WIND={y0:1780,y1:1300,f:0.055};    // banda di vento (in aria)
+
+/* ---------- stato ---------- */
+const G={state:'title',t:0,shake:0,falls:0,best:0,startT:0,elapsed:0,won:false};
+let pl, charge, charging, snow=[], dust=[], flash=0;
+let bestY=FLOOR;
+
+function reset(full){
+  pl={x:W/2-7,y:FLOOR-18,w:14,h:18,vx:0,vy:0,onGround:true,dir:1,face:1,land:0,peak:FLOOR};
+  charge=0;charging=false;
+  if(full){G.falls=0;bestY=FLOOR;G.startT=performance.now();G.elapsed=0;G.won=false}
+  for(const p of PLATS){p.gone=0;p.timer=0;p.x=p.x0}
+}
+reset(true);
+G.best=+(localStorage.getItem('sisifoBest')||0);
+$('best').textContent=G.best+' m';
+
+/* neve parallasse */
+for(let i=0;i<90;i++)snow.push({x:Math.random()*W,y:Math.random()*H,
+  s:0.25+Math.random()*0.8,r:Math.random()*1.6+0.5,d:Math.random()*6});
+
+/* ---------- audio ---------- */
+let ac=null,muted=false;
+function tone(f,dur,type,vol,slide){
+  if(muted)return;
+  try{
+    ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+    const o=ac.createOscillator(),g=ac.createGain();
+    o.type=type||'sine';o.frequency.setValueAtTime(f,ac.currentTime);
+    if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(40,slide),ac.currentTime+dur);
+    g.gain.setValueAtTime(vol||0.05,ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0006,ac.currentTime+dur);
+    o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+dur);
+  }catch(e){}
+}
+const sJump=c=>tone(240+c*420,0.16,'triangle',0.06,180);
+const sLand=()=>tone(120,0.11,'sine',0.05,70);
+const sBounce=()=>tone(320,0.09,'square',0.035,200);
+const sCrack=()=>tone(90,0.22,'sawtooth',0.05,50);
+const sFall=()=>tone(150,0.5,'sine',0.09,45);
+const sWin=()=>{[523,659,784,1046].forEach((f,i)=>setTimeout(()=>tone(f,0.5,'triangle',0.07),i*140))};
+
+/* ---------- input ---------- */
+const K={left:false,right:false,jump:false};
+function down(k){ if(k==='jump'&&!K.jump&&pl.onGround)charging=true; K[k]=true }
+function up(k){
+  if(k==='jump'&&charging){ release(); }
+  K[k]=false;
+}
+addEventListener('keydown',e=>{
+  if(e.repeat)return;
+  if(e.code==='KeyR'){reset(true);return}
+  if(e.code==='KeyM'){muted=!muted;return}
+  if(e.code==='ArrowLeft'||e.code==='KeyA')down('left');
+  else if(e.code==='ArrowRight'||e.code==='KeyD')down('right');
+  else if(e.code==='Space'||e.code==='ArrowUp'||e.code==='KeyW'){down('jump');e.preventDefault()}
+});
+addEventListener('keyup',e=>{
+  if(e.code==='ArrowLeft'||e.code==='KeyA')up('left');
+  else if(e.code==='ArrowRight'||e.code==='KeyD')up('right');
+  else if(e.code==='Space'||e.code==='ArrowUp'||e.code==='KeyW'){up('jump');e.preventDefault()}
+});
+// mouse / touch: metà sinistra o destra dello schermo decide la direzione
+const scr=$('screen');
+scr.addEventListener('pointerdown',e=>{
+  if(G.state!=='play')return;
+  const r=scr.getBoundingClientRect();
+  const rel=(e.clientX-r.left)/r.width;
+  if(rel<0.4)down('left'); else if(rel>0.6)down('right');
+  down('jump'); e.preventDefault();
+});
+addEventListener('pointerup',()=>{ if(G.state!=='play')return; up('jump');K.left=false;K.right=false });
+
+function release(){
+  charging=false;
+  if(!pl.onGround){charge=0;return}
+  const c=charge;
+  const dir=(K.left?-1:0)+(K.right?1:0);
+  pl.vy=-(3.6+c*7.4);
+  pl.vx=dir*(1.1+c*3.9);
+  pl.onGround=false; pl.peak=pl.y;
+  sJump(c); charge=0;
+}
+
+/* ---------- fisica ---------- */
+function solid(p){return p.gone<=0}
+function overlap(a,p){return a.x<p.x+p.w&&a.x+a.w>p.x&&a.y<p.y+p.h&&a.y+a.h>p.y}
+
+function step(){
+  G.t++;
+  if(G.shake>0)G.shake--;
+  if(flash>0)flash--;
+  if(Math.random()<0.0016)flash=8;
+
+  // piattaforme mobili + assi marce
+  for(const p of PLATS){
+    if(p.t===3){ p.ph+=0.013; p.x=p.x0+Math.sin(p.ph)*p.rng; }
+    if(p.gone>0){ p.gone--; if(p.gone===0)p.timer=0 }
+  }
+
+  if(G.state!=='play')return;
+  G.elapsed=performance.now()-G.startT;
+
+  // carica
+  if(charging&&pl.onGround){
+    charge=Math.min(1,charge+1/38);
+    if(G.t%4===0)tone(160+charge*220,0.03,'square',0.02);
+    pl.vx=0;
+  }
+  if(K.left)pl.face=-1; if(K.right)pl.face=1;
+
+  // gravità sempre attiva: tiene il personaggio incollato alla piattaforma
+  const grounded=pl.onGround;
+  pl.vy=Math.min(pl.vy+0.40,13);
+  if(!grounded&&pl.y<WIND.y0&&pl.y>WIND.y1) pl.vx+=Math.sin(G.t*0.02)*WIND.f;
+
+  /* --- asse X --- */
+  pl.x+=pl.vx;
+  if(pl.x<0){pl.x=0;if(Math.abs(pl.vx)>0.8){pl.vx=-pl.vx*0.62;sBounce()}else pl.vx=0}
+  if(pl.x+pl.w>W){pl.x=W-pl.w;if(Math.abs(pl.vx)>0.8){pl.vx=-pl.vx*0.62;sBounce()}else pl.vx=0}
+  for(const p of PLATS){
+    if(!solid(p)||!overlap(pl,p))continue;
+    if(pl.vx>0){pl.x=p.x-pl.w} else if(pl.vx<0){pl.x=p.x+p.w}
+    if(Math.abs(pl.vx)>0.8){pl.vx=-pl.vx*0.62;sBounce()}else pl.vx=0;
+  }
+
+  /* --- asse Y --- */
+  const wasAir=!pl.onGround;
+  pl.y+=pl.vy; pl.onGround=false;
+  for(const p of PLATS){
+    if(!solid(p)||!overlap(pl,p))continue;
+    if(pl.vy>0){                       // atterraggio
+      pl.y=p.y-pl.h; pl.onGround=true;
+      if(wasAir){
+        const drop=pl.y-pl.peak;
+        sLand();
+        for(let i=0;i<8;i++)dust.push({x:pl.x+7,y:pl.y+18,vx:(Math.random()-.5)*2,vy:-Math.random()*1.2,l:20});
+        if(drop>420){ G.falls++; G.shake=14; sFall(); sting(drop); $('falls').textContent=G.falls }
+        if(p.t===1){ pl.vy=0; }        // ghiaccio: conserva lo slancio
+        else { pl.vx=0; }
+        if(p.t===2){ p.timer=1 }       // asse marcia: comincia a cedere
+      }
+      pl.vy=0;
+      if(p.t===3&&pl.onGround)pl.x+=Math.cos(p.ph)*p.rng*0.013;
+    }else if(pl.vy<0){ pl.y=p.y+p.h; pl.vy=0.6 }   // testata
+  }
+
+  // attrito
+  if(pl.onGround){
+    const on=PLATS.find(p=>solid(p)&&pl.x+pl.w>p.x&&pl.x<p.x+p.w&&Math.abs(pl.y+pl.h-p.y)<2);
+    if(on&&on.t===1)pl.vx*=0.995; else if(!charging)pl.vx*=0.6;
+    if(on&&on.t===2&&on.timer>0){
+      on.timer++;
+      if(on.timer>34){ on.gone=190; sCrack(); pl.onGround=false;
+        for(let i=0;i<10;i++)dust.push({x:on.x+on.w/2,y:on.y,vx:(Math.random()-.5)*3,vy:Math.random()*1.5,l:26}); }
+    }
+  }
+
+  // record e vittoria
+  if(pl.y<bestY)bestY=pl.y;
+  const m=M(pl.y);
+  $('alt').textContent=m+' m';
+  if(m>G.best){G.best=m;localStorage.setItem('sisifoBest',m);$('best').textContent=m+' m'}
+  railUpdate();
+
+  if(!G.won&&pl.y<=SUMMIT-6&&pl.onGround){
+    G.won=true;G.state='win';sWin();
+    $('winTxt').textContent='Sei arrivato in cima in '+fmt(G.elapsed)+', dopo '+G.falls+
+      (G.falls===1?' caduta rovinosa':' cadute rovinose')+'. La torre resta lì, identica, pronta a ricominciare.';
+    $('ovWin').classList.remove('hide');
+  }
+
+  // particelle
+  for(let i=dust.length-1;i>=0;i--){const d=dust[i];d.x+=d.vx;d.y+=d.vy;d.vy+=0.06;if(--d.l<=0)dust.splice(i,1)}
+}
+
+function sting(drop){
+  const msgs=['GIÙ DI NUOVO','TUTTO DA RIFARE','ERA QUASI FATTA','—'+Math.round(drop/22)+' m','LA TORRE VINCE ANCORA'];
+  const el=$('toast');
+  el.textContent=drop>1200?msgs[4]:(drop>700?msgs[1]:msgs[3]);
+  el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+}
+const fmt=ms=>{const s=Math.floor(ms/1000);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
+
+/* ---------- altimetro laterale ---------- */
+function railUpdate(){
+  const rail=$('rail'), hgt=rail.clientHeight;
+  const f=y=>hgt*(1-(FLOOR-y)/(FLOOR-SUMMIT));
+  $('railMe').style.top=Math.max(0,Math.min(hgt-2,f(pl.y)))+'px';
+  $('railRec').style.top=Math.max(0,Math.min(hgt-1,f(FLOOR-G.best*22-24)))+'px';
+}
+
+/* ---------- disegno ---------- */
+function px(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(x|0,y|0,w|0,h|0)}
+let cam=FLOOR-H+80;
+
+function draw(){
+  // camera morbida, resta in basso quando cadi
+  const want=Math.max(SUMMIT-120,Math.min(pl.y-H*0.58,FLOOR-H+80));
+  cam+=(want-cam)*0.1;
+
+  ctx.save();
+  if(G.shake>0)ctx.translate((Math.random()-.5)*G.shake,(Math.random()-.5)*G.shake);
+
+  // cielo: più sali, più si fa scuro e rarefatto
+  const h=(FLOOR-cam)/(FLOOR-SUMMIT);
+  const g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#070912'); g.addColorStop(0.55,'#101627'); g.addColorStop(1,'#1a2138');
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+
+  // stelle
+  for(let i=0;i<70;i++){
+    const sx=(i*97)%W, sy=((i*173)%2000)-cam*0.06;
+    const yy=((sy%H)+H)%H;
+    if(yy<H-120)px(sx,yy,1,1,i%5?'#3d4763':'#98a6c4');
+  }
+  // luna
+  const my=140-cam*0.03; if(my>-60&&my<H+60){
+    ctx.globalAlpha=.5;ctx.fillStyle='#cfd8e8';ctx.beginPath();ctx.arc(352,my,17,0,7);ctx.fill();
+    ctx.fillStyle='#0d1220';ctx.beginPath();ctx.arc(344,my-5,15,0,7);ctx.fill();ctx.globalAlpha=1;
+  }
+  if(flash>0){ctx.fillStyle='rgba(190,205,235,'+(flash/8*0.20)+')';ctx.fillRect(0,0,W,H)}
+
+  // pareti della torre
+  px(0,0,16,H,'#0f1424'); px(W-16,0,16,H,'#0f1424');
+  for(let y=-((cam*0.9)%26);y<H;y+=26){
+    px(0,y,16,2,'#171d31'); px(W-16,y,16,2,'#171d31');
+  }
+  // neve
+  for(const s of snow){
+    s.y+=s.s*1.1; s.x+=Math.sin((G.t+s.d)*0.02)*0.35;
+    if(s.y>H){s.y=-4;s.x=Math.random()*W}
+    ctx.globalAlpha=0.16+s.s*0.34; px(s.x,s.y,s.r,s.r,'#c9d4ea'); ctx.globalAlpha=1;
+  }
+
+  // banda di vento
+  const wy0=WIND.y0-cam, wy1=WIND.y1-cam;
+  if(wy1<H&&wy0>0){
+    ctx.globalAlpha=.09;px(0,wy1,W,wy0-wy1,'#7fa6d8');ctx.globalAlpha=1;
+    for(let i=0;i<9;i++){const yy=wy1+((i*54+G.t*2.2)%(wy0-wy1));
+      ctx.globalAlpha=.25;px(20+((i*67+G.t*3)%(W-60)),yy,26,1,'#9dbfe8');ctx.globalAlpha=1}
+  }
+
+  // linea del record
+  const ry=(FLOOR-G.best*22-24)-cam;
+  if(G.best>0&&ry>0&&ry<H){
+    ctx.strokeStyle='#cfd8e8';ctx.globalAlpha=.35;ctx.setLineDash([5,7]);
+    ctx.beginPath();ctx.moveTo(16,ry);ctx.lineTo(W-16,ry);ctx.stroke();
+    ctx.setLineDash([]);ctx.globalAlpha=.6;
+    ctx.font='9px "IBM Plex Mono",monospace';ctx.fillStyle='#cfd8e8';
+    ctx.fillText('RECORD '+G.best+'m',20,ry-4);ctx.globalAlpha=1;
+  }
+
+  // piattaforme
+  for(const p of PLATS){
+    const y=p.y-cam; if(y<-30||y>H+30)continue;
+    if(p.gone>0){ ctx.globalAlpha=.16; px(p.x,y,p.w,3,'#3b4258'); ctx.globalAlpha=1; continue }
+    let top,body;
+    if(p.t===1){top='#bfe3f2';body='#5f8ba6'}
+    else if(p.t===2){top='#7d6a4a';body='#4a3c28'}
+    else if(p.t===3){top='#8d93a8';body='#3a4055'}
+    else {top='#5a6480';body='#2b3145'}
+    if(p.t===0){top='#5a6480';body='#2b3145'}
+    px(p.x,y,p.w,p.h,body); px(p.x,y,p.w,3,top);
+    if(p.t===0)for(let bx=0;bx<p.w-6;bx+=14)px(p.x+bx+3,y+5,10,1,'#232839');
+    if(p.t===2){ // assi: venature e crepe quando cede
+      for(let bx=0;bx<p.w-4;bx+=9)px(p.x+bx+2,y+4,6,1,'#3a2f1e');
+      if(p.timer>0){ctx.globalAlpha=.5+Math.sin(G.t*0.6)*0.4;px(p.x,y,p.w,3,'#d08a4a');ctx.globalAlpha=1}
+    }
+    if(p.t===1)for(let bx=0;bx<p.w-6;bx+=11)px(p.x+bx+4,y+4,3,2,'#e8f6ff');
+    if(p.y===SUMMIT){ // il faro della vetta
+      const fl=6+Math.sin(G.t*0.09)*2;
+      const rg=ctx.createRadialGradient(p.x+p.w/2,y-14,0,p.x+p.w/2,y-14,46);
+      rg.addColorStop(0,'rgba(255,179,71,.55)');rg.addColorStop(1,'rgba(255,179,71,0)');
+      ctx.fillStyle=rg;ctx.fillRect(p.x-40,y-60,p.w+80,80);
+      px(p.x+p.w/2-3,y-14,6,14,'#6b5330'); px(p.x+p.w/2-4,y-20-fl/3,8,8,'#ffb347');
+    }
+  }
+
+  // alone della lanterna
+  const py=pl.y-cam;
+  const lg=ctx.createRadialGradient(pl.x+7,py+8,2,pl.x+7,py+8,74);
+  lg.addColorStop(0,'rgba(255,179,71,.28)');lg.addColorStop(.5,'rgba(255,179,71,.09)');
+  lg.addColorStop(1,'rgba(255,179,71,0)');
+  ctx.fillStyle=lg;ctx.fillRect(pl.x-70,py-64,154,150);
+
+  // polvere
+  for(const d of dust){ctx.globalAlpha=Math.max(0,d.l/24);px(d.x,d.y-cam,2,2,'#8a93aa');ctx.globalAlpha=1}
+
+  // scalatore: si accovaccia mentre carica
+  const sq=charging?charge*5:0;
+  const bx=pl.x, by=py+sq;
+  px(bx+3,by+13-sq/2,4,5-sq/3,'#2a2f42'); px(bx+7,by+13-sq/2,4,5-sq/3,'#2a2f42');   // gambe
+  px(bx+1,by+5,12,9-sq/2,'#3f5570');                                                // mantello
+  px(bx+2,by+5,10,3,'#4d6884');
+  px(bx+4,by-1+sq/2,7,7,'#e0c9a6');                                                 // volto
+  px(bx+3,by-3+sq/2,9,4,'#334a63');                                                 // cappuccio
+  px(bx+(pl.face>0?11:1),by+4+sq/2,2,2,'#1a1f2e');
+  const lx=bx+(pl.face>0?13:-2);                                                    // lanterna
+  px(lx,by+7,3,4,'#6b5330'); px(lx,by+6,3,1,'#ffb347');
+
+  // indicatore di carica sopra la testa
+  if(charging){
+    const cw=26, cx=bx+7-cw/2, cy=by-12;
+    px(cx-1,cy-1,cw+2,5,'#0d1220');
+    px(cx,cy,cw*charge,3,charge>0.92?'#ff6b6b':'#ffb347');
+  }
+  ctx.restore();
+
+  $('time').textContent=fmt(G.elapsed);
+}
+
+/* ---------- overlay ---------- */
+$('btnStart').addEventListener('click',()=>{
+  $('ovTitle').classList.add('hide');
+  reset(true); G.state='play'; G.startT=performance.now();
+  try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();ac.resume()}catch(e){}
+});
+$('btnAgain').addEventListener('click',()=>{
+  $('ovWin').classList.add('hide'); reset(true); G.state='play'; G.startT=performance.now();
+});
+
+(function loop(){ step(); draw(); requestAnimationFrame(loop) })();
+railUpdate();
+})();
+</script>
+
+<a class="pgai-back" href="../index.html" aria-label="Torna a PlaygroundAI">&#9666; PlaygroundAI</a>

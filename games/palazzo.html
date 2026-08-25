@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="it">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Venti piani di sequenze da memorizzare: specchi, rotazioni, inganni e nebbia. Gioca gratis su PlaygroundAI.">
+<meta name="theme-color" content="#0a0d18">
+<title>Palazzo della Memoria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,500&family=Karla:wght@500;700&family=Space+Mono:wght@700&display=swap">
+
+<style>
+:root{
+  --ivory:#f2ead8; --marble:#e6dcc4; --shadowed:#d5c9ac;
+  --walnut:#3a2f24; --dust:#8c7f68;
+  --gilt:#b98a2e; --gilt-lit:#ffcf5e;
+  --wine:#8e2f2f; --wine-lit:#e0524a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:
+    radial-gradient(1000px 600px at 50% -20%, #fbf5e6 0%, transparent 60%),
+    var(--ivory);
+  color:var(--walnut);font-family:"Karla",system-ui,sans-serif;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:12px;padding:14px;overflow:hidden;
+}
+
+.head{width:min(880px,97vw);display:flex;align-items:flex-end;gap:20px}
+.head h1{font-family:"Cormorant Garamond",Georgia,serif;font-weight:700;
+  font-size:clamp(24px,3.4vw,34px);line-height:1;letter-spacing:.5px}
+.head .tag{font-size:10.5px;letter-spacing:3px;text-transform:uppercase;color:var(--dust)}
+.hud{margin-left:auto;display:flex;gap:22px}
+.h{text-align:right}
+.h .k{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--dust)}
+.h .v{font-family:"Space Mono",monospace;font-size:20px;font-weight:700;
+  font-variant-numeric:tabular-nums;line-height:1.15}
+.h .v.g{color:var(--gilt)} .h .v.w{color:var(--wine)}
+
+.hall{position:relative;width:min(880px,97vw);border-radius:6px;overflow:hidden;
+  background:
+    linear-gradient(180deg,#efe6d0 0%, #e9dfc6 100%);
+  border:1px solid #cfc2a4;
+  box-shadow:0 30px 70px rgba(60,45,25,.30), inset 0 0 90px rgba(120,95,55,.10);
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+  padding:20px 20px 26px;min-height:560px;justify-content:center}
+
+.banner{height:56px;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:3px;text-align:center}
+.banner .fl{font-family:"Cormorant Garamond",serif;font-weight:700;font-size:26px}
+.banner .tw{font-size:11px;letter-spacing:2.6px;text-transform:uppercase;color:var(--wine);
+  font-weight:700;min-height:14px}
+.banner .tw.calm{color:var(--dust)}
+
+.boardbox{position:relative;width:min(390px,80vw);aspect-ratio:1}
+.board{position:absolute;inset:0;display:grid;grid-template-columns:repeat(5,1fr);
+  gap:9px;transition:transform .9s cubic-bezier(.6,.05,.25,1)}
+.tile{border:0;border-radius:7px;cursor:pointer;position:relative;
+  background:linear-gradient(160deg,var(--marble),var(--shadowed));
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.55), inset 0 -3px 6px rgba(90,70,40,.25),
+    0 2px 4px rgba(60,45,25,.18);
+  transition:background .12s, box-shadow .12s, opacity .5s, transform .1s}
+.tile:active{transform:scale(.96)}
+.tile.lit{background:linear-gradient(160deg,var(--gilt-lit),var(--gilt));
+  box-shadow:0 0 26px rgba(255,207,94,.75), inset 0 2px 0 rgba(255,255,255,.7)}
+.tile.bad{background:linear-gradient(160deg,var(--wine-lit),var(--wine));
+  box-shadow:0 0 22px rgba(224,82,74,.6)}
+.tile.err{animation:errsh .4s}
+@keyframes errsh{25%{transform:translateX(5px)}50%{transform:translateX(-6px)}75%{transform:translateX(4px)}}
+.board.fog .tile{opacity:.13}
+.board.locked .tile{cursor:default}
+
+.pips{display:flex;gap:5px;height:10px}
+.pips i{width:9px;height:9px;border-radius:50%;background:#d0c3a4;
+  box-shadow:inset 0 1px 2px rgba(90,70,40,.3)}
+.pips i.on{background:var(--gilt);box-shadow:0 0 8px rgba(185,138,46,.7)}
+
+.taunt{min-height:22px;font-family:"Cormorant Garamond",serif;font-style:italic;
+  font-size:16px;color:var(--dust);text-align:center;opacity:0;transition:opacity .5s}
+.taunt.on{opacity:1}
+
+.ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:16px;text-align:center;padding:30px;
+  background:rgba(242,234,216,.97);z-index:5}
+.ov.hide{display:none}
+.ov h2{font-family:"Cormorant Garamond",serif;font-weight:700;
+  font-size:clamp(26px,4.4vw,42px);line-height:1.12;text-wrap:balance}
+.ov h2 em{font-style:italic;color:var(--gilt)}
+.ov p{max-width:52ch;font-size:14px;line-height:1.75;color:#6b5f4c}
+.rules{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;font-size:11.5px}
+.rules span{background:#fff9;border:1px solid #d5c9ac;border-radius:99px;padding:5px 13px}
+button{font-family:"Karla",sans-serif;font-weight:700;font-size:12px;letter-spacing:2.6px;
+  text-transform:uppercase;padding:14px 32px;border:1px solid var(--walnut);border-radius:2px;
+  cursor:pointer;background:var(--walnut);color:var(--ivory);
+  transition:background .15s,color .15s,transform .07s}
+button:hover{background:var(--gilt);border-color:var(--gilt);color:#241c10}
+button:active{transform:translateY(2px)}
+button:focus-visible{outline:2px solid var(--wine);outline-offset:3px}
+
+.crolla{animation:crol .7s}
+@keyframes crol{0%{transform:translateY(0)}20%{transform:translateY(-8px) rotate(-.6deg)}
+  55%{transform:translateY(14px) rotate(.8deg)}100%{transform:translateY(0)}}
+.foot{width:min(880px,97vw);font-size:11px;color:var(--dust)}
+@media (prefers-reduced-motion:reduce){
+  .board{transition:none}.crolla{animation:none}.tile.err{animation:none}
+}
+
+@media (max-width:640px){
+  body{overflow:auto;height:auto;min-height:100vh}
+  .head{flex-wrap:wrap;gap:8px}
+  .hud{margin-left:0;width:100%;justify-content:space-between;gap:8px}
+  .hall{min-height:500px;padding:14px 12px 20px}
+  .rules{font-size:10.5px}
+}
+.pgai-back{position:fixed;bottom:12px;right:12px;z-index:999;font-family:system-ui,sans-serif;
+  font-weight:700;font-size:12px;color:#fff;background:rgba(15,17,28,.78);
+  border:1px solid rgba(255,255,255,.28);padding:8px 13px;border-radius:99px;
+  text-decoration:none;backdrop-filter:blur(6px)}
+.pgai-back:hover{background:rgba(70,80,120,.85)}
+
+</style>
+
+<div class="head">
+  <div>
+    <div class="tag">Venti piani, nessuna pietà</div>
+    <h1>Palazzo della Memoria</h1>
+  </div>
+  <div class="hud">
+    <div class="h"><div class="k">Piano</div><div class="v g" id="hFloor">1</div></div>
+    <div class="h"><div class="k">Vetta</div><div class="v" id="hBest">1</div></div>
+    <div class="h"><div class="k">Crolli</div><div class="v w" id="hFalls">0</div></div>
+    <div class="h"><div class="k">Tempo</div><div class="v" id="hTime">00:00</div></div>
+  </div>
+</div>
+
+<div class="hall" id="hall">
+  <div class="banner">
+    <div class="fl" id="bFloor">Piano I</div>
+    <div class="tw calm" id="bTwist">osserva e ripeti</div>
+  </div>
+
+  <div class="boardbox">
+    <div class="board" id="board"></div>
+  </div>
+
+  <div class="pips" id="pips"></div>
+  <div class="taunt" id="taunt"></div>
+
+  <div class="ov" id="ovIntro">
+    <h2>Il palazzo non dimentica.<br><em>Tu sì.</em></h2>
+    <p>Ogni piano ti mostra una sequenza di lastre dorate: ripetila. Sbaglia una sola lastra e <b>crolli di svariati piani</b> — e la sequenza che troverai risalendo sarà nuova, quindi la memoria spicciola non ti salverà. Dal quarto piano in su, il palazzo comincia a barare: lo dichiara sempre, ma non ti aiuta.</p>
+    <div class="rules">
+      <span><b style="color:var(--wine)">Specchio</b> — ripeti al contrario</span>
+      <span><b style="color:var(--wine)">Rotazione</b> — la sala gira dopo la sequenza</span>
+      <span><b style="color:var(--wine)">Inganni</b> — i lampi rossi non esistono</span>
+      <span><b style="color:var(--wine)">Nebbia</b> — ripeti su lastre quasi invisibili</span>
+    </div>
+    <button id="btnGo">Sali al primo piano</button>
+  </div>
+
+  <div class="ov hide" id="ovWin">
+    <h2>La <em>vetta</em> del palazzo</h2>
+    <p id="winTxt">—</p>
+    <button id="btnAgain">Ridiscendi e ricomincia</button>
+  </div>
+</div>
+
+<div class="foot">Le note musicali accompagnano le lastre vere; i lampi rossi hanno un tonfo sordo — fidati delle orecchie. · M audio</div>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const board=$('board'), hall=$('hall');
+const N=5, TOP=20;
+const ROMAN=['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII',
+  'XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX'];
+
+/* ---------- audio ---------- */
+let ac=null,muted=false;
+function tone(f,d,type,v,to){
+  if(muted||!ac)return;
+  const t=ac.currentTime;
+  const o=ac.createOscillator(),g=ac.createGain();
+  o.type=type||'sine';o.frequency.setValueAtTime(f,t);
+  if(to)o.frequency.exponentialRampToValueAtTime(Math.max(40,to),t+d);
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(v||0.06,t+0.006);
+  g.gain.exponentialRampToValueAtTime(0.0006,t+d);
+  o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+d+0.05);
+}
+const mtof=m=>440*Math.pow(2,(m-69)/12);
+const SCALE=[60,62,64,67,69,72,74,76,79,81];
+const noteFor=i=>{tone(mtof(SCALE[(i%N)+(((i/N)|0)%2)*5]),0.30,'triangle',0.08);
+  tone(mtof(SCALE[(i%N)+(((i/N)|0)%2)*5]+12),0.18,'sine',0.03)};
+const thud=()=>tone(110,0.16,'sawtooth',0.05,60);
+const errSnd=()=>{tone(233,0.5,'sawtooth',0.09,110);tone(246,0.5,'sawtooth',0.07,116)};
+const fallSnd=()=>{[76,72,67,62,57,52].forEach((m,k)=>
+  setTimeout(()=>tone(mtof(m),0.22,'triangle',0.08),k*90))};
+const clearSnd=()=>{[60,64,67,72].forEach((m,k)=>
+  setTimeout(()=>tone(mtof(m),0.35,'triangle',0.07),k*80))};
+const winSnd=()=>{[60,64,67,72,76,79].forEach((m,k)=>
+  setTimeout(()=>tone(mtof(m),0.6,'triangle',0.08),k*130))};
+
+/* ---------- piani e trucchi ---------- */
+/* [specchio, rotazione, inganni, nebbia] */
+const TW=[
+  [0,0,0,0],[0,0,0,0],[0,0,0,0],
+  [1,0,0,0],[0,0,0,0],[0,0,1,0],[0,1,0,0],[1,0,1,0],[0,1,1,0],[0,0,0,1],
+  [1,1,0,0],[0,0,1,1],[0,1,0,1],[1,0,0,1],[1,1,1,0],[1,0,1,1],[0,1,1,1],
+  [1,1,0,1],[1,1,1,1],[1,1,1,1]
+];
+const seqLen=f=>3+Math.floor((f-1)*0.6);
+const showMs=f=>Math.max(250,650-f*20);
+const fallDepth=f=>f<=1?0:Math.min(f-1,2+Math.floor(f/4));
+
+const TAUNTS=[
+  'Il palazzo non dimentica. Tu, evidentemente, sì.',
+  'Quella lastra non ti aveva fatto niente.',
+  'Eri così vicino che quasi dispiace. Quasi.',
+  'La sequenza era nuova, la caduta è la solita.',
+  'I piani bassi ti stavano aspettando.',
+  'Ripeti con calma. Tanto il tempo scorre comunque.',
+  'Anche i grandi mnemonisti crollano. Tu più spesso.'
+];
+
+/* ---------- stato ---------- */
+const G={state:'idle',floor:1,best:1,falls:0,t0:0,el:0,run:false};
+G.bestEver=+(localStorage.getItem('palazzoBest')||1);
+$('hBest').textContent=G.bestEver;
+let seq=[], idx=0, mirror=false, fog=false, tiles=[], rot=0;
+
+for(let i=0;i<N*N;i++){
+  const b=document.createElement('button');
+  b.className='tile'; b.dataset.i=i;
+  b.addEventListener('pointerdown',()=>clickTile(i));
+  board.appendChild(b); tiles.push(b);
+}
+function flash(i,cls,ms){
+  tiles[i].classList.add(cls);
+  setTimeout(()=>tiles[i].classList.remove(cls),ms);
+}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function say(t){const e=$('taunt');e.textContent=t;e.classList.add('on');
+  clearTimeout(say._t);say._t=setTimeout(()=>e.classList.remove('on'),4200)}
+
+function pips(n,done){
+  const p=$('pips');p.innerHTML='';
+  for(let i=0;i<n;i++){const d=document.createElement('i');
+    if(i<done)d.classList.add('on');p.appendChild(d)}
+}
+
+/* ---------- ciclo del piano ---------- */
+async function playFloor(){
+  const f=G.floor, tw=TW[f-1];
+  mirror=!!tw[0]; const doRot=!!tw[1], decoy=!!tw[2]; fog=!!tw[3];
+  G.state='show';
+  board.classList.add('locked'); board.classList.remove('fog');
+  board.style.transform='rotate(0deg)'; rot=0;
+
+  $('bFloor').textContent='Piano '+ROMAN[f-1];
+  $('hFloor').textContent=f;
+  const names=[];
+  if(mirror)names.push('specchio'); if(doRot)names.push('rotazione');
+  if(decoy)names.push('inganni'); if(fog)names.push('nebbia');
+  const bt=$('bTwist');
+  bt.textContent=names.length?names.join(' + '):'osserva e ripeti';
+  bt.className='tw'+(names.length?'':' calm');
+
+  // genera la sequenza: mai due volte di fila la stessa lastra
+  const len=seqLen(f); seq=[];
+  while(seq.length<len){
+    const c=(Math.random()*N*N)|0;
+    if(seq.length&&seq[seq.length-1]===c)continue;
+    seq.push(c);
+  }
+  pips(len,0);
+  await sleep(1050);
+  if(G.state!=='show')return;
+
+  // mostra, con eventuali lampi rossi da ignorare
+  const ms=showMs(f);
+  for(let k=0;k<seq.length;k++){
+    if(G.state!=='show')return;
+    if(decoy&&Math.random()<0.45){
+      const lie=(Math.random()*N*N)|0;
+      flash(lie,'bad',ms*0.5); thud();
+      await sleep(ms*0.75);
+    }
+    flash(seq[k],'lit',ms*0.62); noteFor(seq[k]);
+    await sleep(ms);
+  }
+  if(decoy&&Math.random()<0.5){
+    const lie=(Math.random()*N*N)|0; flash(lie,'bad',ms*0.5); thud();
+    await sleep(ms*0.6);
+  }
+
+  // rotazione della sala
+  if(doRot){
+    await sleep(280);
+    rot=[90,180,270][(Math.random()*3)|0];
+    board.style.transform='rotate('+rot+'deg)';
+    tone(160,0.7,'sine',0.05,90);
+    await sleep(1000);
+  }
+  if(fog)board.classList.add('fog');
+
+  idx=0; G.state='recall';
+  board.classList.remove('locked');
+  say('');
+}
+
+function expected(k){ return mirror? seq[seq.length-1-k] : seq[k]; }
+
+function clickTile(i){
+  if(G.state!=='recall')return;
+  if(i===expected(idx)){
+    flash(i,'lit',180); noteFor(i);
+    idx++; pips(seq.length,idx);
+    if(idx>=seq.length)floorClear();
+  }else{
+    fail(i);
+  }
+}
+
+async function floorClear(){
+  G.state='idle'; board.classList.add('locked');
+  clearSnd();
+  await sleep(650);
+  board.classList.remove('fog');
+  if(G.floor>=TOP){ win(); return; }
+  G.floor++;
+  if(G.floor>G.best)G.best=G.floor;
+  if(G.floor>G.bestEver){G.bestEver=G.floor;
+    localStorage.setItem('palazzoBest',G.bestEver);$('hBest').textContent=G.bestEver}
+  playFloor();
+}
+
+async function fail(i){
+  G.state='idle'; board.classList.add('locked');
+  errSnd();
+  tiles[i].classList.add('err'); flash(i,'bad',600);
+  flash(expected(idx),'lit',600);          // ti mostra cos'era, per girare il coltello
+  setTimeout(()=>tiles[i].classList.remove('err'),450);
+  G.falls++; $('hFalls').textContent=G.falls;
+  const depth=fallDepth(G.floor);
+  await sleep(750);
+  board.classList.remove('fog');
+  if(depth>0){
+    hall.classList.remove('crolla'); void hall.offsetWidth; hall.classList.add('crolla');
+    fallSnd();
+    G.floor=Math.max(1,G.floor-depth);
+    say(TAUNTS[(Math.random()*TAUNTS.length)|0]+'  (−'+depth+' piani)');
+    await sleep(900);
+  }else{
+    say(TAUNTS[(Math.random()*TAUNTS.length)|0]);
+    await sleep(500);
+  }
+  playFloor();
+}
+
+function win(){
+  G.run=false; winSnd();
+  $('winTxt').textContent='Venti piani in '+fmtT(G.el)+', con '+G.falls+
+    (G.falls===1?' crollo':' crolli')+'. Il palazzo si inchina — e intanto rimescola le lastre per la prossima volta.';
+  $('ovWin').classList.remove('hide');
+}
+const fmtT=ms=>{const s=ms/1000|0;
+  return String(s/60|0).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
+
+/* ---------- cronometro ---------- */
+setInterval(()=>{ if(G.run){G.el=performance.now()-G.t0;
+  $('hTime').textContent=fmtT(G.el)} },250);
+
+/* ---------- avvio ---------- */
+function startRun(){
+  ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+  if(ac.state==='suspended')ac.resume();
+  G.floor=1;G.best=1;G.falls=0;G.t0=performance.now();G.el=0;G.run=true;
+  $('hFalls').textContent=0;
+  playFloor();
+}
+$('btnGo').addEventListener('click',()=>{$('ovIntro').classList.add('hide');startRun()});
+$('btnAgain').addEventListener('click',()=>{$('ovWin').classList.add('hide');startRun()});
+addEventListener('keydown',e=>{ if(e.code==='KeyM')muted=!muted });
+})();
+</script>
+
+<a class="pgai-back" href="../index.html" aria-label="Torna a PlaygroundAI">&#9666; PlaygroundAI</a>
