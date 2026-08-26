@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="it">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Affetta la frutta al volo con un colpo di dito: combo, bombe e punteggio. Gioca gratis su PlaygroundAI.">
+<meta name="theme-color" content="#0a0d18">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3368917580765134" crossorigin="anonymous"></script>
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
+<title>Fruttivendolo Ninja</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;800&family=JetBrains+Mono:wght@700&display=swap">
+
+<style>
+:root{
+  --sky:#f7e8c9; --wood:#9c6b3f; --ink:#4a3020;
+  --dim:#a68a6a; --orange:#f28c28; --red:#d94f3d; --green:#6a9a4a; --gold:#f0b429;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:
+    radial-gradient(900px 500px at 50% -10%, #fdf3dd 0%, transparent 60%),
+    #f2e2c2;
+  color:var(--ink);font-family:"Nunito",system-ui,sans-serif;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;padding:12px;overflow:hidden;
+}
+.head{width:min(960px,97vw);display:flex;align-items:flex-end;gap:16px}
+.logo{font-family:"Lilita One",sans-serif;font-size:30px;line-height:1;
+  color:var(--red);text-shadow:2px 2px 0 #f7d9a0}
+.sub{font-size:11px;color:var(--dim);padding-bottom:3px;letter-spacing:1px}
+.hud{margin-left:auto;display:flex;gap:20px;align-items:flex-end}
+.h{text-align:right}
+.h .k{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--dim)}
+.h .v{font-family:"JetBrains Mono",monospace;font-size:20px;font-weight:700;
+  font-variant-numeric:tabular-nums}
+.h .v.o{color:var(--orange)}
+.lives{display:flex;gap:6px;padding-bottom:4px}
+.lives i{width:16px;height:16px;border-radius:50%;background:var(--green);
+  border:2.5px solid #4a7a34;transition:background .2s,border-color .2s,transform .2s}
+.lives i.x{background:var(--red);border-color:#a03325;transform:scale(.85)}
+
+.stage{position:relative;width:min(960px,97vw);border-radius:14px;overflow:hidden;
+  border:3px solid #c89a5f;box-shadow:0 26px 60px rgba(110,70,30,.30)}
+canvas{display:block;width:100%;height:auto;cursor:none;touch-action:none}
+
+.combo{position:absolute;left:50%;top:20%;transform:translateX(-50%);
+  font-family:"Lilita One",sans-serif;font-size:34px;color:var(--gold);
+  text-shadow:2px 3px 0 #8a5a20;pointer-events:none;opacity:0}
+.combo.on{animation:cb 1.1s ease-out}
+@keyframes cb{0%{opacity:0;transform:translateX(-50%) scale(.6)}
+  20%{opacity:1;transform:translateX(-50%) scale(1.15)}
+  70%{opacity:1}100%{opacity:0;transform:translateX(-50%) translateY(-24px)}}
+
+.ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:16px;text-align:center;padding:30px;
+  background:rgba(247,232,201,.96);z-index:5}
+.ov.hide{display:none}
+.ov h2{font-family:"Lilita One",sans-serif;font-size:clamp(28px,4.6vw,46px);
+  line-height:1.1;color:var(--red);text-shadow:2px 3px 0 #f0d5a5}
+.ov p{max-width:50ch;font-size:14px;line-height:1.7;color:#7a5f42}
+.ov .big{font-family:"JetBrains Mono",monospace;font-size:40px;font-weight:700;color:var(--orange)}
+button{font-family:"Lilita One",sans-serif;font-size:17px;letter-spacing:1px;
+  padding:14px 36px;border:0;border-radius:99px;cursor:pointer;
+  background:var(--green);color:#fff;box-shadow:0 5px 0 #4a7a34;
+  transition:filter .15s,transform .08s,box-shadow .08s}
+button:hover{filter:brightness(1.07)}
+button:active{transform:translateY(4px);box-shadow:0 1px 0 #4a7a34}
+button:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.foot{width:min(960px,97vw);font-size:11px;color:var(--dim)}
+
+html,body{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.pgai-back{position:fixed;bottom:12px;right:12px;z-index:999;font-family:system-ui,sans-serif;font-weight:700;font-size:12px;color:#fff;background:rgba(15,17,28,.78);border:1px solid rgba(255,255,255,.28);padding:8px 13px;border-radius:99px;text-decoration:none;backdrop-filter:blur(6px)}
+.pgai-back:hover{background:rgba(70,80,120,.85)}
+@media (max-width:700px){body{overflow:auto;height:auto;min-height:100vh}.head{flex-wrap:wrap;gap:8px}.hud{margin-left:0;width:100%;justify-content:space-between;flex-wrap:wrap;gap:8px}.foot{flex-wrap:wrap;gap:8px}}
+canvas{touch-action:none}
+</style>
+
+<div class="head">
+  <div>
+    <div class="logo">Fruttivendolo Ninja</div>
+    <div class="sub">il banco più pericoloso del mercato</div>
+  </div>
+  <div class="hud">
+    <div class="lives" id="lives"><i></i><i></i><i></i></div>
+    <div class="h"><div class="k">Punti</div><div class="v o" id="hScore">0</div></div>
+    <div class="h"><div class="k">Record</div><div class="v" id="hBest">0</div></div>
+  </div>
+</div>
+
+<div class="stage" id="stage">
+  <canvas id="cv" width="960" height="560"></canvas>
+  <div class="combo" id="combo"></div>
+
+  <div class="ov" id="ovMenu">
+    <h2>Affetta tutto,<br>tranne le bombe</h2>
+    <p>Muovi il mouse <b>velocemente</b> attraverso la frutta per affettarla: i tagli lenti non contano. Tre o più frutti in un colpo solo fanno <b style="color:var(--gold)">combo</b>. Ogni frutto che cade a terra costa una cassetta, e le <b style="color:var(--red)">bombe</b> pure — e ti azzerano la combo. Occhio al <b style="color:var(--gold)">fico d'oro</b>: vale 50.</p>
+    <button id="btnGo">Apri il banco</button>
+  </div>
+
+  <div class="ov hide" id="ovOver">
+    <h2>Banco chiuso</h2>
+    <div class="big" id="oScore">0</div>
+    <p id="oTxt">—</p>
+    <button id="btnAgain">Riapri il banco</button>
+  </div>
+</div>
+
+<div class="foot">Taglio valido solo in velocità · la frutta arriva a ondate sempre più fitte · M audio</div>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const cv=$('cv'), ctx=cv.getContext('2d');
+const VW=960, VH=560;
+
+/* ---------- audio ---------- */
+let ac=null,muted=false,noiseB=null;
+function tone(f,d,type,v,to){
+  if(muted||!ac)return;
+  const t=ac.currentTime,o=ac.createOscillator(),g=ac.createGain();
+  o.type=type||'sine';o.frequency.setValueAtTime(f,t);
+  if(to)o.frequency.exponentialRampToValueAtTime(Math.max(30,to),t+d);
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(v||0.06,t+0.006);
+  g.gain.exponentialRampToValueAtTime(0.0006,t+d);
+  o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+d+0.05);
+}
+function noise(v,fq,d,type){
+  if(muted||!ac)return;
+  if(!noiseB){const n=ac.sampleRate;noiseB=ac.createBuffer(1,n,ac.sampleRate);
+    const dd=noiseB.getChannelData(0);for(let i=0;i<n;i++)dd[i]=Math.random()*2-1}
+  const t=ac.currentTime,s=ac.createBufferSource();s.buffer=noiseB;s.loop=true;
+  const f=ac.createBiquadFilter();f.type=type||'bandpass';f.frequency.value=fq;
+  const g=ac.createGain();g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(v,t+0.008);
+  g.gain.exponentialRampToValueAtTime(0.0006,t+d);
+  s.connect(f);f.connect(g);g.connect(ac.destination);s.start(t);s.stop(t+d+0.03);
+}
+let swooshCd=0;
+const sSwoosh=()=>{if(swooshCd>0)return;swooshCd=7;noise(0.05,2600,0.14,'bandpass')};
+const sSplat=i=>{tone(180-i*12,0.10,'sine',0.07,70);noise(0.05,900,0.09,'lowpass')};
+const sBomb=()=>{tone(70,0.5,'sawtooth',0.14,35);noise(0.15,300,0.45,'lowpass')};
+const sCombo=()=>[880,1100,1320].forEach((f,k)=>setTimeout(()=>tone(f,0.16,'triangle',0.07),k*55));
+const sGold=()=>[1046,1318,1568].forEach((f,k)=>setTimeout(()=>tone(f,0.3,'triangle',0.08),k*70));
+const sMiss=()=>tone(200,0.3,'sawtooth',0.05,80);
+
+/* ---------- frutta ---------- */
+const KINDS=[
+ {id:'arancia', r:26, skin:'#f28c28', flesh:'#ffb757', pts:3,  w:26, leaf:true},
+ {id:'limone',  r:22, skin:'#f2cf3a', flesh:'#faeaa0', pts:4,  w:22, leaf:true, oval:true},
+ {id:'anguria', r:38, skin:'#4a7a3a', flesh:'#e85a4a', pts:6,  w:14, stripes:true, seeds:true},
+ {id:'pesca',   r:24, skin:'#f2846a', flesh:'#ffd9a0', pts:4,  w:20, leaf:true},
+ {id:'melagrana',r:26,skin:'#b23a3a', flesh:'#e06a6a', pts:5,  w:16, crown:true},
+ {id:'ficodindia',r:22,skin:'#c05a8a',flesh:'#e89ab8', pts:5,  w:14, spots:true},
+ {id:'ficodoro',r:22, skin:'#f0b429', flesh:'#ffe9a8', pts:50, w:3,  gold:true}
+];
+const totW=KINDS.reduce((a,k)=>a+k.w,0);
+function pickKind(){
+  let r=Math.random()*totW;
+  for(const k of KINDS){ if((r-=k.w)<=0) return k; }
+  return KINDS[0];
+}
+
+/* ---------- stato ---------- */
+const G={state:'menu',score:0,lives:3,t:0,spawnT:1.2,waveT:8,diff:0,best:0,
+  comboN:0,comboT:0,shake:0,flash:0};
+G.best=+(localStorage.getItem('fruttaBest')||0);$('hBest').textContent=G.best;
+let fruits=[],halves=[],parts=[],splats=[],floats=[],trail=[];
+let mouse={x:VW/2,y:VH/2,px:VW/2,py:VH/2,speed:0};
+
+function spawnFruit(bomb){
+  const x=120+Math.random()*(VW-240);
+  const vx=(VW/2-x)*0.004+(Math.random()-0.5)*2.4;
+  const vy=-(12.6+Math.random()*3.4);
+  if(bomb) fruits.push({bomb:true,r:24,x,y:VH+30,vx,vy,rot:Math.random()*6,vr:(Math.random()-.5)*0.1,fuse:0});
+  else{
+    const k=pickKind();
+    fruits.push({k,r:k.r,x,y:VH+30,vx,vy,rot:Math.random()*6,vr:(Math.random()-.5)*0.12});
+  }
+}
+function wave(n){
+  for(let i=0;i<n;i++)setTimeout(()=>{if(G.state==='play')spawnFruit(false)},i*160);
+}
+
+/* ---------- taglio ---------- */
+function segCircle(x1,y1,x2,y2,cx,cy,r){
+  const dx=x2-x1,dy=y2-y1,L2=dx*dx+dy*dy||1;
+  let h=((cx-x1)*dx+(cy-y1)*dy)/L2; h=h<0?0:h>1?1:h;
+  const px2=x1+dx*h,py2=y1+dy*h;
+  return (cx-px2)**2+(cy-py2)**2 <= r*r;
+}
+let sliceBatch=0, sliceTimer=null;
+function trySlice(){
+  if(G.state!=='play')return;
+  if(mouse.speed<22)return;
+  sSwoosh();
+  const ang=Math.atan2(mouse.y-mouse.py,mouse.x-mouse.px);
+  for(let i=fruits.length-1;i>=0;i--){
+    const f=fruits[i];
+    if(!segCircle(mouse.px,mouse.py,mouse.x,mouse.y,f.x,f.y,f.r+6))continue;
+    fruits.splice(i,1);
+    if(f.bomb){ boom(f); continue; }
+    sliceFruit(f,ang);
+  }
+}
+function sliceFruit(f,ang){
+  const k=f.k;
+  G.score+=k.pts;$('hScore').textContent=G.score;
+  sSplat(sliceBatch); if(k.gold)sGold();
+  floats.push({x:f.x,y:f.y-k.r,txt:'+'+k.pts,c:k.gold?'#f0b429':'#fff',l:1});
+  // due metà che volano
+  const perp=ang+Math.PI/2;
+  for(const s of[-1,1]){
+    halves.push({k,x:f.x+Math.cos(perp)*s*4,y:f.y+Math.sin(perp)*s*4,
+      vx:f.vx+Math.cos(perp)*s*2.6,vy:f.vy*0.4-1.5,
+      rot:ang,vr:s*0.14,side:s,l:1});
+  }
+  // succo
+  for(let i=0;i<14;i++){const a=Math.random()*6.28,v=1+Math.random()*3.4;
+    parts.push({x:f.x,y:f.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-1,l:30,c:k.flesh})}
+  splats.push({x:f.x,y:f.y,r:k.r*1.3,c:k.flesh,l:1});
+  // conteggio combo nella stessa sciabolata
+  sliceBatch++;
+  clearTimeout(sliceTimer);
+  sliceTimer=setTimeout(()=>{
+    if(sliceBatch>=3){
+      const bonus=sliceBatch*10;
+      G.score+=bonus;$('hScore').textContent=G.score;
+      const c=$('combo');c.textContent='COMBO ×'+sliceBatch+'  +'+bonus;
+      c.classList.remove('on');void c.offsetWidth;c.classList.add('on');
+      sCombo();
+    }
+    sliceBatch=0;
+  },230);
+}
+function boom(f){
+  sBomb(); G.shake=16; G.flash=1; sliceBatch=0;
+  for(let i=0;i<26;i++){const a=Math.random()*6.28,v=2+Math.random()*4;
+    parts.push({x:f.x,y:f.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,l:34,c:i%2?'#f2a13a':'#5a5a5a'})}
+  loseLife();
+}
+function loseLife(){
+  G.lives--;
+  const li=$('lives').children;
+  for(let i=0;i<3;i++)li[i].classList.toggle('x',i>=G.lives);
+  if(G.lives<=0)gameOver();
+}
+function gameOver(){
+  G.state='over';
+  $('oScore').textContent=G.score.toLocaleString('it-IT');
+  $('oTxt').textContent=G.score>G.best?'Nuovo record del mercato!':
+    'Il record resta '+G.best.toLocaleString('it-IT')+'. Il fruttivendolo ti aspetta.';
+  if(G.score>G.best){G.best=G.score;localStorage.setItem('fruttaBest',G.best);
+    $('hBest').textContent=G.best}
+  $('ovOver').classList.remove('hide');
+}
+
+/* ---------- update ---------- */
+let last=performance.now();
+function update(){
+  const now=performance.now(),dt=Math.min(0.05,(now-last)/1000);last=now;
+  if(swooshCd>0)swooshCd--;
+  if(G.shake>0)G.shake--; if(G.flash>0)G.flash-=0.05;
+  mouse.speed=Math.hypot(mouse.x-mouse.px,mouse.y-mouse.py);
+  trySlice();
+  trail.push({x:mouse.x,y:mouse.y,s:mouse.speed});
+  if(trail.length>12)trail.shift();
+  mouse.px=mouse.x;mouse.py=mouse.y;
+
+  if(G.state!=='play'){cleanup(dt);return}
+  G.t+=dt; G.diff=Math.min(1,G.t/90);
+
+  // spawn
+  G.spawnT-=dt;
+  if(G.spawnT<=0){
+    G.spawnT=(1.35-G.diff*0.75)*(0.7+Math.random()*0.6);
+    spawnFruit(Math.random()<0.10+G.diff*0.14);
+  }
+  G.waveT-=dt;
+  if(G.waveT<=0){G.waveT=9-G.diff*3.5; wave(4+(G.diff*5|0));}
+
+  // fisica frutta
+  for(let i=fruits.length-1;i>=0;i--){
+    const f=fruits[i];
+    f.vy+=13.4*dt; f.x+=f.vx*60*dt*0.34; f.y+=f.vy*60*dt*0.34;
+    f.rot+=f.vr; if(f.bomb)f.fuse+=dt;
+    if(f.x<f.r&&f.vx<0)f.vx=-f.vx; if(f.x>VW-f.r&&f.vx>0)f.vx=-f.vx;
+    if(f.y>VH+50&&f.vy>0){
+      fruits.splice(i,1);
+      if(!f.bomb){ sMiss(); floats.push({x:f.x,y:VH-30,txt:'persa!',c:'#d94f3d',l:1}); loseLife(); }
+    }
+  }
+  cleanup(dt);
+}
+function cleanup(dt){
+  for(let i=halves.length-1;i>=0;i--){const h=halves[i];
+    h.vy+=13.4*dt;h.x+=h.vx*60*dt*0.34;h.y+=h.vy*60*dt*0.34;h.rot+=h.vr;
+    if(h.y>VH+80)halves.splice(i,1)}
+  for(let i=parts.length-1;i>=0;i--){const p=parts[i];
+    p.x+=p.vx;p.y+=p.vy;p.vy+=0.14;if((p.l-=1)<=0)parts.splice(i,1)}
+  for(let i=splats.length-1;i>=0;i--){if((splats[i].l-=dt*0.25)<=0)splats.splice(i,1)}
+  for(let i=floats.length-1;i>=0;i--){const f=floats[i];
+    f.y-=0.8;if((f.l-=0.02)<=0)floats.splice(i,1)}
+}
+
+/* ---------- disegno ---------- */
+function draw(){
+  ctx.save();
+  if(G.shake>0)ctx.translate((Math.random()-.5)*G.shake,(Math.random()-.5)*G.shake);
+
+  // fondale mercato
+  const g=ctx.createLinearGradient(0,0,0,VH);
+  g.addColorStop(0,'#f7e8c9');g.addColorStop(0.75,'#efd9ad');g.addColorStop(1,'#e2c democracy'.slice(0,7));
+  ctx.fillStyle=g;ctx.fillRect(0,0,VW,VH);
+  // tenda a righe
+  for(let i=0;i<12;i++){
+    ctx.fillStyle=i%2?'#d94f3d':'#f7f0dd';
+    ctx.beginPath();
+    ctx.rect(i*80,0,80,26);ctx.fill();
+    ctx.beginPath();ctx.arc(i*80+40,26,40,0,Math.PI);ctx.fill();
+  }
+  // bancone in fondo
+  ctx.fillStyle='#9c6b3f';ctx.fillRect(0,VH-46,VW,46);
+  ctx.fillStyle='#8a5c34';ctx.fillRect(0,VH-46,VW,8);
+  ctx.fillStyle='rgba(255,255,255,.08)';
+  for(let i=0;i<16;i++)ctx.fillRect(i*60+8,VH-34,44,3);
+
+  // macchie di succo
+  for(const s of splats){
+    ctx.globalAlpha=s.l*0.35;ctx.fillStyle=s.c;
+    ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,6.283);ctx.fill();
+    ctx.beginPath();ctx.arc(s.x+s.r*0.7,s.y+s.r*0.4,s.r*0.4,0,6.283);ctx.fill();
+    ctx.beginPath();ctx.arc(s.x-s.r*0.8,s.y-s.r*0.3,s.r*0.3,0,6.283);ctx.fill();
+  }
+  ctx.globalAlpha=1;
+
+  // frutta intera
+  for(const f of fruits){
+    ctx.save();ctx.translate(f.x,f.y);ctx.rotate(f.rot);
+    if(f.bomb){
+      ctx.fillStyle='#2e2a2a';
+      ctx.beginPath();ctx.arc(0,0,f.r,0,6.283);ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,.15)';
+      ctx.beginPath();ctx.arc(-f.r*0.3,-f.r*0.3,f.r*0.4,0,6.283);ctx.fill();
+      ctx.strokeStyle='#6a5a4a';ctx.lineWidth=3;
+      ctx.beginPath();ctx.moveTo(0,-f.r);ctx.quadraticCurveTo(8,-f.r-12,14,-f.r-8);ctx.stroke();
+      const sp=Math.sin(f.fuse*22)>0;
+      ctx.fillStyle=sp?'#ffd166':'#f28c28';
+      ctx.beginPath();ctx.arc(15,-f.r-8,sp?5:3.4,0,6.283);ctx.fill();
+      ctx.fillStyle='#fff';ctx.font='700 16px Nunito,sans-serif';ctx.textAlign='center';
+      ctx.fillText('✕',0,6);
+    }else drawFruit(f.k,f.r);
+    ctx.restore();
+  }
+  // metà
+  for(const h of halves){
+    ctx.save();ctx.translate(h.x,h.y);ctx.rotate(h.rot);
+    const k=h.k, a0=h.side>0?0:Math.PI, a1=a0+Math.PI;
+    ctx.fillStyle=k.flesh;
+    ctx.beginPath();ctx.arc(0,0,k.r,a0,a1);ctx.closePath();ctx.fill();
+    ctx.strokeStyle=k.skin;ctx.lineWidth=5;
+    ctx.beginPath();ctx.arc(0,0,k.r-2,a0,a1);ctx.stroke();
+    if(k.seeds){ctx.fillStyle='#3a2a24';
+      for(let i=0;i<4;i++){const aa=a0+0.4+i*0.6;
+        ctx.beginPath();ctx.ellipse(Math.cos(aa)*k.r*0.55,Math.sin(aa)*k.r*0.55,3,4.4,aa,0,6.283);ctx.fill()}}
+    if(k.id==='arancia'||k.id==='limone'){
+      ctx.strokeStyle='rgba(255,255,255,.7)';ctx.lineWidth=2;
+      for(let i=0;i<4;i++){const aa=a0+0.3+i*0.65;
+        ctx.beginPath();ctx.moveTo(0,0);
+        ctx.lineTo(Math.cos(aa)*k.r*0.8,Math.sin(aa)*k.r*0.8);ctx.stroke()}}
+    ctx.restore();
+  }
+  // particelle
+  for(const p of parts){ctx.globalAlpha=Math.max(0,p.l/34);ctx.fillStyle=p.c;
+    ctx.beginPath();ctx.arc(p.x,p.y,3,0,6.283);ctx.fill()}
+  ctx.globalAlpha=1;
+
+  // lama
+  for(let i=1;i<trail.length;i++){
+    const a=trail[i-1],b=trail[i],k=i/trail.length;
+    ctx.strokeStyle='rgba(255,255,255,'+(k*0.85)+')';
+    ctx.lineWidth=7*k;ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+    ctx.strokeStyle='rgba(150,200,255,'+(k*0.4)+')';
+    ctx.lineWidth=12*k;
+    ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+  }
+  ctx.fillStyle='#fff';
+  ctx.beginPath();ctx.arc(mouse.x,mouse.y,3.4,0,6.283);ctx.fill();
+
+  // testi
+  ctx.textAlign='center';
+  for(const f of floats){
+    ctx.globalAlpha=Math.max(0,Math.min(1,f.l));
+    ctx.fillStyle=f.c;ctx.font='800 17px Nunito,sans-serif';
+    ctx.strokeStyle='rgba(74,48,32,.6)';ctx.lineWidth=3;
+    ctx.strokeText(f.txt,f.x,f.y);ctx.fillText(f.txt,f.x,f.y);
+  }
+  ctx.globalAlpha=1;
+  if(G.flash>0){ctx.fillStyle='rgba(255,180,80,'+(G.flash*0.4)+')';ctx.fillRect(0,0,VW,VH)}
+  ctx.restore();
+}
+function drawFruit(k,r){
+  if(k.gold){ctx.shadowColor='#f0b429';ctx.shadowBlur=22}
+  ctx.fillStyle=k.skin;
+  ctx.beginPath();
+  if(k.oval)ctx.ellipse(0,0,r*1.15,r*0.85,0,0,6.283); else ctx.arc(0,0,r,0,6.283);
+  ctx.fill();ctx.shadowBlur=0;
+  ctx.fillStyle='rgba(255,255,255,.28)';
+  ctx.beginPath();ctx.ellipse(-r*0.35,-r*0.35,r*0.42,r*0.3,-0.6,0,6.283);ctx.fill();
+  if(k.stripes){ctx.strokeStyle='#3a6329';ctx.lineWidth=5;
+    for(let i=-2;i<=2;i++){ctx.beginPath();
+      ctx.arc(i*r*0.42,0,r*0.95,-1.2,1.2);ctx.stroke()}}
+  if(k.spots){ctx.fillStyle='rgba(74,48,32,.35)';
+    for(let i=0;i<6;i++){const a=i*1.05;
+      ctx.beginPath();ctx.arc(Math.cos(a)*r*0.55,Math.sin(a)*r*0.55,1.8,0,6.283);ctx.fill()}}
+  if(k.crown){ctx.fillStyle='#8a2a2a';
+    ctx.beginPath();ctx.moveTo(-7,-r+2);ctx.lineTo(-4,-r-8);ctx.lineTo(0,-r+1);
+    ctx.lineTo(4,-r-8);ctx.lineTo(7,-r+2);ctx.closePath();ctx.fill()}
+  if(k.leaf){ctx.fillStyle='#5a8a3a';
+    ctx.beginPath();ctx.ellipse(r*0.4,-r*0.95,9,4.4,-0.7,0,6.283);ctx.fill()}
+}
+
+/* ---------- input ---------- */
+addEventListener('pointermove',ev=>{
+  const r=cv.getBoundingClientRect();
+  mouse.x=(ev.clientX-r.left)/r.width*VW;
+  mouse.y=(ev.clientY-r.top)/r.height*VH;
+});
+addEventListener('keydown',e=>{ if(e.code==='KeyM')muted=!muted });
+
+function start(){
+  ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+  if(ac.state==='suspended')ac.resume();
+  G.state='play';G.score=0;G.lives=3;G.t=0;G.diff=0;G.spawnT=0.8;G.waveT=7;
+  fruits=[];halves=[];parts=[];splats=[];floats=[];sliceBatch=0;
+  $('hScore').textContent=0;
+  const li=$('lives').children;for(let i=0;i<3;i++)li[i].classList.remove('x');
+  wave(3);
+}
+$('btnGo').addEventListener('click',()=>{$('ovMenu').classList.add('hide');start()});
+$('btnAgain').addEventListener('click',()=>{$('ovOver').classList.add('hide');start()});
+
+let reported=false;
+(function loop(){
+  try{ update(); draw(); }
+  catch(err){ if(!reported){reported=true;console.error(err)} }
+  requestAnimationFrame(loop);
+})();
+})();
+</script>
+<script>document.addEventListener("contextmenu",function(e){if(e.target&&e.target.tagName==="CANVAS")e.preventDefault()});</script>
+<a class="pgai-back" href="../index.html" aria-label="Torna a PlaygroundAI">&#9666; PlaygroundAI</a>
+<script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("/sw.js"))</script>

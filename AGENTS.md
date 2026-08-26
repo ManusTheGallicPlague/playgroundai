@@ -10,7 +10,7 @@ Statico puro: niente build, niente framework, niente dipendenze. Quello che c'è
 
 ## Struttura
 - `index.html` — home: griglia dei 6 giochi, slot pubblicitari, sezioni. CSS/JS inline.
-- `games/*.html` — 6 giochi, **ognuno un singolo file autonomo** (CSS+JS inline, canvas/DOM, audio sintetizzato via WebAudio). Nessun asset esterno tranne Google Fonts.
+- `games/*.html` — 12 giochi, **ognuno un singolo file autonomo** (CSS+JS inline, canvas/DOM, audio sintetizzato via WebAudio). Nessun asset esterno tranne Google Fonts.
 - `privacy.html` — informativa privacy/cookie (richiesta da AdSense).
 - `sw.js` — service worker (PWA): stale-while-revalidate stesso dominio + cache font.
 - `manifest.json`, `icon-*.png`, `apple-touch-icon.png` — PWA.

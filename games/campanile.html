@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="it">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Guarda il panorama e indovina dove sei in Italia: il GeoGuessr tricolore. Gioca gratis su PlaygroundAI.">
+<meta name="theme-color" content="#0a0d18">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3368917580765134" crossorigin="anonymous"></script>
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
+<title>Campanile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Libre+Franklin:wght@500;700&family=Space+Mono:wght@700&display=swap">
+
+<style>
+:root{
+  --paper:#f6efdd; --card:#fdf9ee; --line:#e0d4b6;
+  --sea:#b8d8d4; --land:#dce4bf; --coast:#7a9367;
+  --ink:#3d3428; --dim:#95886f;
+  --terra:#c05b3c; --gold:#c99a2e; --ok:#5f8f5a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:
+    radial-gradient(900px 500px at 80% -10%, #fbf6e8 0%, transparent 60%),
+    var(--paper);
+  color:var(--ink);font-family:"Libre Franklin",system-ui,sans-serif;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;padding:12px;overflow:hidden;
+}
+.head{width:min(1010px,98vw);display:flex;align-items:flex-end;gap:16px}
+.head h1{font-family:"Fraunces",Georgia,serif;font-weight:800;
+  font-size:clamp(24px,3.4vw,34px);line-height:1;color:var(--terra)}
+.head .tag{font-size:10.5px;letter-spacing:2.6px;text-transform:uppercase;color:var(--dim)}
+.hud{margin-left:auto;display:flex;gap:20px}
+.h{text-align:right}
+.h .k{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--dim)}
+.h .v{font-family:"Space Mono",monospace;font-size:19px;font-weight:700;
+  font-variant-numeric:tabular-nums}
+.h .v.t{color:var(--terra)}
+
+.wrap{width:min(1010px,98vw);display:flex;gap:12px;align-items:stretch}
+.mapbox{position:relative;border-radius:12px;overflow:hidden;
+  border:2px solid var(--line);box-shadow:0 20px 50px rgba(90,70,40,.22);
+  background:var(--sea)}
+canvas{display:block;cursor:crosshair}
+
+.panel{flex:1;display:flex;flex-direction:column;gap:10px;
+  background:var(--card);border:2px solid var(--line);border-radius:12px;
+  padding:16px;box-shadow:0 20px 50px rgba(90,70,40,.16)}
+.panel .rt{font-size:10px;letter-spacing:2.4px;text-transform:uppercase;color:var(--dim)}
+.panel h2{font-family:"Fraunces",serif;font-weight:800;font-size:21px;line-height:1.15}
+.clues{display:flex;flex-direction:column;gap:8px;flex:1}
+.clue{border-left:3px solid var(--gold);background:#fff9;border-radius:0 9px 9px 0;
+  padding:9px 12px;font-size:13.5px;line-height:1.55;animation:cin .4s ease-out}
+@keyframes cin{from{opacity:0;transform:translateX(-8px)}}
+.clue b{color:var(--terra)}
+.mult{font-size:11.5px;color:var(--dim)}
+.mult b{color:var(--ink);font-family:"Space Mono",monospace}
+.btns{display:flex;gap:8px}
+button{font-family:"Libre Franklin",sans-serif;font-weight:700;font-size:11.5px;
+  letter-spacing:1.8px;text-transform:uppercase;padding:12px 16px;border-radius:8px;
+  cursor:pointer;border:2px solid var(--terra);background:var(--terra);color:#fff;
+  transition:filter .15s,transform .07s;flex:1}
+button.ghost{background:transparent;color:var(--terra)}
+button:disabled{opacity:.4;cursor:default}
+button:hover:not(:disabled){filter:brightness(1.08)}
+button:active:not(:disabled){transform:translateY(2px)}
+button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+.res{border-top:2px dashed var(--line);padding-top:10px;display:none;
+  flex-direction:column;gap:6px}
+.res.on{display:flex}
+.res .place{font-family:"Fraunces",serif;font-weight:800;font-size:19px;color:var(--ok)}
+.res .nums{display:flex;gap:18px;font-family:"Space Mono",monospace;font-size:14px}
+.res .nums .pt{color:var(--terra)}
+
+.ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:16px;text-align:center;padding:30px;
+  background:rgba(246,239,221,.97);z-index:5}
+.ov.hide{display:none}
+.ov h2{font-family:"Fraunces",serif;font-weight:800;font-size:clamp(26px,4.2vw,40px);
+  line-height:1.12;text-wrap:balance}
+.ov h2 em{font-style:normal;color:var(--terra)}
+.ov p{max-width:52ch;font-size:14px;line-height:1.7;color:#6e6250}
+.ov .tot{font-family:"Space Mono",monospace;font-size:44px;font-weight:700;color:var(--terra)}
+.ov .rk{font-family:"Fraunces",serif;font-size:19px;color:var(--gold)}
+.stage{position:relative;width:min(1010px,98vw);display:flex}
+.foot{width:min(1010px,98vw);font-size:11px;color:var(--dim)}
+
+html,body{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.pgai-back{position:fixed;bottom:12px;right:12px;z-index:999;font-family:system-ui,sans-serif;font-weight:700;font-size:12px;color:#fff;background:rgba(15,17,28,.78);border:1px solid rgba(255,255,255,.28);padding:8px 13px;border-radius:99px;text-decoration:none;backdrop-filter:blur(6px)}
+.pgai-back:hover{background:rgba(70,80,120,.85)}
+@media (max-width:700px){body{overflow:auto;height:auto;min-height:100vh}.head{flex-wrap:wrap;gap:8px}.hud{margin-left:0;width:100%;justify-content:space-between;flex-wrap:wrap;gap:8px}.foot{flex-wrap:wrap;gap:8px}}
+canvas{touch-action:manipulation}
+@media (max-width:800px){.wrap,.room,.main{flex-direction:column}}
+</style>
+
+<div class="head">
+  <div>
+    <div class="tag">Il geoguessr dello Stivale</div>
+    <h1>Campanile</h1>
+  </div>
+  <div class="hud">
+    <div class="h"><div class="k">Round</div><div class="v" id="hRound">1/5</div></div>
+    <div class="h"><div class="k">Punti</div><div class="v t" id="hScore">0</div></div>
+    <div class="h"><div class="k">Record</div><div class="v" id="hBest">0</div></div>
+  </div>
+</div>
+
+<div class="stage">
+<div class="wrap" id="game">
+  <div class="mapbox">
+    <canvas id="cv" width="470" height="560"></canvas>
+  </div>
+  <div class="panel">
+    <div>
+      <div class="rt" id="pRound">Round 1 di 5</div>
+      <h2>Che posto è questo?</h2>
+    </div>
+    <div class="clues" id="clues"></div>
+    <div class="mult">Valore del round: <b id="mult">×1.00</b> — ogni indizio in più lo riduce</div>
+    <div class="btns">
+      <button class="ghost" id="btnClue">Altro indizio</button>
+      <button id="btnGuess" disabled>Conferma qui</button>
+    </div>
+    <div class="res" id="res">
+      <div class="place" id="rPlace">—</div>
+      <div class="nums">
+        <span id="rDist">— km</span>
+        <span class="pt" id="rPts">+0</span>
+      </div>
+      <button id="btnNext">Prossimo round</button>
+    </div>
+  </div>
+</div>
+
+<div class="ov" id="ovIntro">
+  <h2>Cinque luoghi d'Italia.<br>Sai <em>dove</em> sono?</h2>
+  <p>Leggi l'indizio e pianta la bandierina sulla carta: più il tuo campanile è vicino a quello vero, più punti prendi. Puoi chiedere fino a tre indizi in più, ma ogni aiuto abbassa il valore del round. Sotto i 15 km è punteggio pieno: 5000.</p>
+  <button style="flex:0 0 auto;padding:14px 34px" id="btnStart">Si parte</button>
+</div>
+
+<div class="ov hide" id="ovEnd">
+  <h2 id="endT">Giro d'Italia finito</h2>
+  <div class="tot" id="endTot">0</div>
+  <div class="rk" id="endRk">—</div>
+  <p id="endTxt">—</p>
+  <button style="flex:0 0 auto;padding:14px 34px" id="btnAgain">Nuovo giro</button>
+</div>
+</div>
+
+<div class="foot">Carta stilizzata: conta il campanile, non il catasto · punteggio = 5000 × e^(−km/100) × valore round</div>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const cv=$('cv'), ctx=cv.getContext('2d');
+const MW=470, MH=560;
+
+/* ---------- proiezione ---------- */
+const LON0=6.4, LON1=19.0, LAT0=36.4, LAT1=47.3;
+const KY=(MH-40)/(LAT1-LAT0), KX=KY*0.74, OX=(MW-KX*(LON1-LON0))/2+6, OY=20;
+const px=lon=>OX+(lon-LON0)*KX, py=lat=>OY+(LAT1-lat)*KY;
+const unproj=(x,y)=>({lon:LON0+(x-OX)/KX, lat:LAT1-(y-OY)/KY});
+function hav(a,b){
+  const R=6371,d2r=Math.PI/180;
+  const dla=(b.lat-a.lat)*d2r, dlo=(b.lon-a.lon)*d2r;
+  const q=Math.sin(dla/2)**2+Math.cos(a.lat*d2r)*Math.cos(b.lat*d2r)*Math.sin(dlo/2)**2;
+  return 2*R*Math.asin(Math.sqrt(q));
+}
+
+/* ---------- geografia stilizzata ---------- */
+const MAINLAND=[[7.50,43.79],[8.10,43.92],[8.70,44.42],[9.50,44.36],[9.85,44.06],
+[10.25,43.85],[10.30,43.45],[10.52,42.93],[11.10,42.40],[11.75,42.10],[12.20,41.70],
+[12.80,41.22],[13.60,41.25],[13.95,40.80],[14.45,40.62],[14.78,40.66],[14.95,40.42],
+[15.35,40.00],[15.80,39.65],[15.85,38.90],[15.63,38.22],[15.68,37.94],[16.06,37.92],
+[16.55,38.42],[16.58,38.76],[17.12,38.92],[17.15,39.40],[16.52,39.80],[16.90,40.10],
+[17.30,40.35],[17.95,40.28],[18.36,39.80],[18.50,40.15],[18.00,40.65],[17.30,40.98],
+[16.87,41.13],[16.20,41.35],[16.19,41.89],[15.60,41.92],[15.00,41.98],[14.20,42.47],
+[13.52,43.62],[12.90,43.92],[12.57,44.06],[12.28,44.42],[12.40,44.95],[12.30,45.44],
+[13.10,45.60],[13.75,45.65],[13.65,46.10],[13.40,46.35],[12.40,46.70],[11.60,46.95],
+[11.00,46.97],[10.10,46.60],[9.30,46.35],[8.50,46.25],[7.90,45.98],[7.00,45.90],
+[6.80,45.20],[6.90,44.60],[7.50,44.15]];
+const SICILY=[[12.43,37.80],[12.55,38.05],[13.05,38.15],[13.35,38.22],[13.90,38.03],
+[14.60,38.12],[15.20,38.24],[15.65,38.27],[15.55,37.90],[15.30,37.55],[15.10,37.30],
+[15.30,37.06],[15.10,36.70],[14.40,36.75],[13.85,37.10],[13.20,37.45],[12.90,37.57]];
+const SARDINIA=[[8.20,40.95],[8.90,41.25],[9.28,41.26],[9.63,40.90],[9.72,40.30],
+[9.60,39.20],[9.35,39.10],[9.05,39.12],[8.60,38.90],[8.35,39.05],[8.42,39.90],[8.15,40.60]];
+
+/* ---------- luoghi e indizi ---------- */
+const DB=[
+{n:'Roma',lat:41.90,lon:12.50,c:['Ci vivono due Stati, e uno dei due sta tutto dentro un quartiere.','Qui la carbonara è una religione e il "maritozzo" una colazione.','Un anfiteatro da 50.000 posti regge da duemila anni.','Tutte le strade, dicono, portano qui.']},
+{n:'Milano',lat:45.46,lon:9.19,c:['La nebbia è un ricordo, i grattacieli no.','Aperitivo alle 18:30: è quasi legge.','La cattedrale gotica ha più guglie che giorni l\'anno.','Capitale della moda e del risotto giallo.']},
+{n:'Napoli',lat:40.85,lon:14.27,c:['Un vulcano la guarda dormire da sempre.','Qui la pizza ha il passaporto e il cornicione alto.','Sotto la città c\'è un\'altra città, scavata nel tufo.','Vedila e poi… il resto lo sai.']},
+{n:'Venezia',lat:45.44,lon:12.34,c:['Le strade qui si chiamano "calli" e si bagnano spesso.','L\'autobus è un battello, il taxi pure.','Un leone alato veglia sulla piazza più famosa.','Gondole, ponti e acqua alta.']},
+{n:'Torino',lat:45.07,lon:7.69,c:['Le Alpi fanno da sfondo a viali perfettamente dritti.','Gianduia e bicerin: qui il cioccolato fa sul serio.','Una mole con la cupola ospita il museo del cinema.','Prima capitale d\'Italia.']},
+{n:'Palermo',lat:38.12,lon:13.36,c:['Mercati che sembrano casbah e chiese normanne.','Pane e panelle, sfincione, e il "pani ca meusa" per i coraggiosi.','I mosaici dorati di Monreale sono a due passi.','Capoluogo dell\'isola più grande del Mediterraneo.']},
+{n:'Bologna',lat:44.49,lon:11.34,c:['Chilometri di portici ti riparano dalla pioggia.','Il ragù qui ha un nome che tutto il mondo sbaglia.','L\'università è la più antica d\'Europa.','La Dotta, la Grassa, la Rossa.']},
+{n:'Firenze',lat:43.77,lon:11.26,c:['Il Rinascimento qui è praticamente ovunque.','La bistecca si ordina a peso e guai a chiederla ben cotta.','Una cupola in mattoni sfidò le leggi dell\'ingegneria.','Il David abita qui.']},
+{n:'Bari',lat:41.13,lon:16.87,c:['Le orecchiette si fanno per strada, davanti a casa.','Un santo molto amato anche in Russia riposa qui.','Il lungomare è tra i più lunghi d\'Italia.','Capoluogo pugliese col porto verso l\'Oriente.']},
+{n:'Cagliari',lat:39.22,lon:9.12,c:['I fenicotteri rosa abitano le saline in città.','Qui la bottarga condisce gli spaghetti.','Il quartiere alto si chiama Castello e domina il golfo.','Capoluogo dell\'isola dei nuraghi.']},
+{n:'Genova',lat:44.41,lon:8.93,c:['I vicoli qui si chiamano "caruggi" e profumano di focaccia.','Il pesto è nato tra queste mura.','Il suo acquario è il più grande d\'Italia.','La Superba, patria di Colombo.']},
+{n:'Verona',lat:45.44,lon:10.99,c:['Un\'arena romana ospita l\'opera sotto le stelle.','Qui si scrive a una ragazza che non è mai esistita.','Un balcone attira milioni di innamorati.','Shakespeare la scelse per la sua tragedia più famosa.']},
+{n:'Trieste',lat:45.65,lon:13.77,c:['Il vento qui ha un nome proprio e sposta le persone.','Il caffè si ordina con un lessico tutto suo: "nero", "capo in b"…','Una piazza enorme si affaccia direttamente sul mare.','L\'ultima città prima della Slovenia.']},
+{n:'Matera',lat:40.67,lon:16.60,c:['Le case qui sono scavate nella roccia da millenni.','Il pane ha una forma a cornetto ed è presidio dell\'identità.','Set naturale di decine di film biblici.','I suoi "Sassi" sono patrimonio UNESCO.']},
+{n:'Lecce',lat:40.35,lon:18.17,c:['Il barocco qui è così ricco che ha preso il nome della città.','Il caffè si beve con il ghiaccio e il latte di mandorla.','Siamo nel tacco, ma non sul mare.','La Firenze del Sud.']},
+{n:'Catania',lat:37.51,lon:15.09,c:['La città è nera: è fatta di pietra lavica.','Qui la pasta ha il nome di un\'opera di Bellini.','Un mercato del pesce urla ogni mattina da secoli.','Ai piedi del vulcano attivo più alto d\'Europa.']},
+{n:'L\'Aquila',lat:42.35,lon:13.40,c:['Capoluogo montano ferito da un terremoto e in rinascita.','Una fontana ha 99 cannelle, come i castelli fondatori.','Lo zafferano più pregiato d\'Italia cresce qui vicino.','Il Gran Sasso le fa ombra.']},
+{n:'Perugia',lat:43.11,lon:12.39,c:['Città etrusca su un colle, con scale mobili dentro le mura.','Il cioccolato ha qui il suo "bacio" più famoso.','Un festival jazz la invade ogni estate.','Capoluogo umbro.']},
+{n:'Bolzano',lat:46.50,lon:11.35,c:['Qui i cartelli parlano due lingue.','Canederli e speck battono pasta e pomodoro.','Un uomo di 5300 anni riposa nel suo museo.','Porta delle Dolomiti, profumo d\'Austria.']},
+{n:'Aosta',lat:45.74,lon:7.32,c:['Piccola capitale alpina circondata da Quattromila.','La fontina nasce nelle sue valli.','Un arco romano accoglie chi arriva.','Capoluogo della regione più piccola d\'Italia.']},
+{n:'Siena',lat:43.32,lon:11.33,c:['Due volte l\'anno una piazza a conchiglia impazzisce.','Il panforte e i ricciarelli addolciscono l\'inverno.','Le contrade sono diciassette e sono una cosa seria.','Il Palio si corre qui.']},
+{n:'Pisa',lat:43.72,lon:10.40,c:['Un errore di cantiere è diventato un\'icona mondiale.','Città universitaria con una Normale molto esclusiva.','Il Campo dei Miracoli è un prato con tre meraviglie.','La sua torre pende da 800 anni.']},
+{n:'Alberobello',lat:40.78,lon:17.24,c:['I tetti qui sono coni di pietra grigia.','Le case bianche hanno simboli dipinti sui tetti.','Un intero rione di queste casette è patrimonio UNESCO.','La capitale dei trulli.']},
+{n:'Pompei',lat:40.75,lon:14.49,c:['Una città intera si è fermata in un giorno d\'agosto.','I calchi dei suoi abitanti commuovono il mondo.','Fu sepolta da cenere e lapilli nel 79 d.C.','L\'eruzione più famosa della storia accadde qui.']},
+{n:'Riomaggiore',lat:44.10,lon:9.74,c:['Case a colori accatastate su una scogliera a picco.','Qui i vigneti sono terrazze sospese sul mare.','È una delle Cinque, la più a sud.','Cinque Terre: questa è la prima arrivando da La Spezia.']},
+{n:'San Gimignano',lat:43.47,lon:11.04,c:['Da lontano sembra una Manhattan medievale.','La vernaccia qui si beve da settecento anni.','Delle 72 torri ne restano quattordici.','Il borgo delle torri, in Toscana.']},
+{n:'Assisi',lat:43.07,lon:12.62,c:['Un santo poverello l\'ha resa meta di pellegrinaggi.','La basilica ha due chiese, una sopra l\'altra.','Giotto vi dipinse la vita del patrono d\'Italia.','La città di Francesco.']},
+{n:'Tropea',lat:38.68,lon:15.90,c:['Una rupe bianca cade in un mare turchese.','La sua cipolla rossa è dolce come una mela.','Un santuario guarda la spiaggia da uno scoglio.','La perla della Calabria tirrenica.']},
+{n:'Taormina',lat:37.85,lon:15.29,c:['Un teatro antico incornicia un vulcano e il mare.','Qui la granita con la brioche è colazione da re.','Isola Bella è la sua spiaggia da cartolina.','Il salotto della Sicilia orientale.']},
+{n:'Cortina d\'Ampezzo',lat:46.54,lon:12.14,c:['Le pareti rosa delle Dolomiti la circondano.','Qui lo sci è mondanità dagli anni Trenta.','Ha ospitato Olimpiadi invernali, e ci ritorna.','La regina delle Dolomiti.']}
+];
+
+/* ---------- stato ---------- */
+const ROUNDS=5, MULTS=[1,0.85,0.7,0.55];
+const G={round:0,score:0,used:1,place:null,guess:null,done:false,order:[],anim:0,best:0};
+G.best=+(localStorage.getItem('campanileBest')||0);
+$('hBest').textContent=G.best;
+let revealT=0;
+
+function pick(){
+  if(!G.order.length){
+    G.order=DB.map((_,i)=>i);
+    for(let i=G.order.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;
+      [G.order[i],G.order[j]]=[G.order[j],G.order[i]]}
+  }
+  return DB[G.order.pop()];
+}
+function startGame(){
+  G.round=0;G.score=0;$('hScore').textContent=0;
+  nextRound();
+}
+function nextRound(){
+  G.round++; G.used=1; G.place=pick(); G.guess=null; G.done=false; G.anim=0;
+  $('hRound').textContent=G.round+'/'+ROUNDS;
+  $('pRound').textContent='Round '+G.round+' di '+ROUNDS;
+  $('clues').innerHTML=''; addClue();
+  $('mult').textContent='×'+MULTS[0].toFixed(2);
+  $('btnClue').disabled=false; $('btnGuess').disabled=true;
+  $('res').classList.remove('on');
+}
+function addClue(){
+  const d=document.createElement('div');
+  d.className='clue';
+  d.innerHTML='<b>Indizio '+G.used+'.</b> '+G.place.c[G.used-1];
+  $('clues').appendChild(d);
+}
+$('btnClue').addEventListener('click',()=>{
+  if(G.used>=4)return;
+  G.used++; addClue();
+  $('mult').textContent='×'+MULTS[G.used-1].toFixed(2);
+  if(G.used>=4)$('btnClue').disabled=true;
+});
+$('btnGuess').addEventListener('click',()=>{
+  if(!G.guess||G.done)return;
+  G.done=true; revealT=performance.now();
+  const d=hav(G.guess,G.place);
+  const raw=d<15?5000:Math.round(5000*Math.exp(-d/100));
+  const pts=Math.round(raw*MULTS[G.used-1]);
+  G.score+=pts; $('hScore').textContent=G.score.toLocaleString('it-IT');
+  $('rPlace').textContent=G.place.n;
+  $('rDist').textContent=Math.round(d)+' km';
+  $('rPts').textContent='+'+pts.toLocaleString('it-IT');
+  $('btnGuess').disabled=true; $('btnClue').disabled=true;
+  $('res').classList.add('on');
+  $('btnNext').textContent=G.round>=ROUNDS?'Vedi il totale':'Prossimo round';
+});
+$('btnNext').addEventListener('click',()=>{
+  if(G.round>=ROUNDS){ endGame(); return; }
+  nextRound();
+});
+function endGame(){
+  const t=G.score;
+  const rk=t>=22000?'Ct della Nazionale dei campanili':
+    t>=17000?'Geografo provetto':t>=12000?'Viaggiatore navigato':
+    t>=7000?'Turista curioso':'Hai bisogno di un Interrail';
+  $('endTot').textContent=t.toLocaleString('it-IT');
+  $('endRk').textContent=rk;
+  $('endTxt').textContent=t>G.best?'Nuovo record personale su questo PC.':
+    'Il record resta '+G.best.toLocaleString('it-IT')+'.';
+  if(t>G.best){G.best=t;localStorage.setItem('campanileBest',t);
+    $('hBest').textContent=t.toLocaleString('it-IT')}
+  $('ovEnd').classList.remove('hide');
+}
+$('btnStart').addEventListener('click',()=>{$('ovIntro').classList.add('hide');startGame()});
+$('btnAgain').addEventListener('click',()=>{$('ovEnd').classList.add('hide');startGame()});
+
+cv.addEventListener('pointerdown',ev=>{
+  if(G.done||!G.place)return;
+  const r=cv.getBoundingClientRect();
+  const x=(ev.clientX-r.left)/r.width*MW, y=(ev.clientY-r.top)/r.height*MH;
+  G.guess=unproj(x,y);
+  $('btnGuess').disabled=false;
+});
+
+/* ---------- disegno ---------- */
+function poly(pts){
+  ctx.beginPath();
+  pts.forEach((p,i)=>{const X=px(p[0]),Y=py(p[1]); i?ctx.lineTo(X,Y):ctx.moveTo(X,Y)});
+  ctx.closePath();
+}
+function draw(){
+  // mare con onde leggere
+  const t=performance.now()/1000;
+  const g=ctx.createLinearGradient(0,0,0,MH);
+  g.addColorStop(0,'#c3dfdb');g.addColorStop(1,'#a9d0cd');
+  ctx.fillStyle=g;ctx.fillRect(0,0,MW,MH);
+  ctx.strokeStyle='rgba(255,255,255,.25)';ctx.lineWidth=1;
+  for(let i=0;i<7;i++){
+    const y=60+i*75+Math.sin(t*0.8+i)*3;
+    ctx.beginPath();
+    for(let x=0;x<MW;x+=8)ctx.lineTo(x,y+Math.sin(x/26+t+i*2)*2.2);
+    ctx.stroke();
+  }
+  // terre
+  for(const land of [MAINLAND,SICILY,SARDINIA]){
+    poly(land);
+    ctx.fillStyle='#dce4bf'; ctx.fill();
+    ctx.strokeStyle='#7a9367'; ctx.lineWidth=2; ctx.stroke();
+    // ombra costa
+    ctx.save();ctx.clip();
+    ctx.strokeStyle='rgba(122,147,103,.25)';ctx.lineWidth=6;ctx.stroke();
+    ctx.restore();
+  }
+  // graticola leggera
+  ctx.strokeStyle='rgba(61,52,40,.07)';ctx.lineWidth=1;
+  for(let lo=8;lo<=18;lo+=2){ctx.beginPath();ctx.moveTo(px(lo),0);ctx.lineTo(px(lo),MH);ctx.stroke()}
+  for(let la=38;la<=46;la+=2){ctx.beginPath();ctx.moveTo(0,py(la));ctx.lineTo(MW,py(la));ctx.stroke()}
+  // rosa dei venti
+  ctx.save();ctx.translate(MW-46,52);
+  ctx.strokeStyle='rgba(61,52,40,.4)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.arc(0,0,17,0,6.283);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(0,-24);ctx.lineTo(5,0);ctx.lineTo(0,8);ctx.lineTo(-5,0);ctx.closePath();
+  ctx.fillStyle='#c05b3c';ctx.fill();
+  ctx.fillStyle='#3d3428';ctx.font='700 10px "Libre Franklin",sans-serif';
+  ctx.textAlign='center';ctx.fillText('N',0,-30);
+  ctx.restore();
+
+  // bandierina del giocatore
+  if(G.guess){
+    const X=px(G.guess.lon), Y=py(G.guess.lat);
+    ctx.strokeStyle='#3d3428';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(X,Y);ctx.lineTo(X,Y-20);ctx.stroke();
+    ctx.fillStyle='#c05b3c';
+    ctx.beginPath();ctx.moveTo(X,Y-20);ctx.lineTo(X+14,Y-15);ctx.lineTo(X,Y-10);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#3d3428';
+    ctx.beginPath();ctx.arc(X,Y,2.5,0,6.283);ctx.fill();
+  }
+  // rivelazione
+  if(G.done&&G.place){
+    const k=Math.min(1,(performance.now()-revealT)/900);
+    const gx=px(G.guess.lon),gy=py(G.guess.lat);
+    const tx=px(G.place.lon),ty=py(G.place.lat);
+    ctx.setLineDash([6,6]);ctx.lineDashOffset=-t*30;
+    ctx.strokeStyle='rgba(192,91,60,.8)';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(gx,gy);
+    ctx.lineTo(gx+(tx-gx)*k, gy+(ty-gy)*k);ctx.stroke();ctx.setLineDash([]);
+    if(k>=1){
+      const pu=1+Math.sin(t*5)*0.12;
+      ctx.fillStyle='#c99a2e';
+      ctx.save();ctx.translate(tx,ty);ctx.scale(pu,pu);
+      // campanile stilizzato
+      ctx.fillRect(-4,-22,8,20);
+      ctx.beginPath();ctx.moveTo(-6,-22);ctx.lineTo(0,-32);ctx.lineTo(6,-22);ctx.closePath();ctx.fill();
+      ctx.fillStyle='#fdf9ee';ctx.fillRect(-2,-18,4,6);
+      ctx.restore();
+      ctx.font='800 13px "Libre Franklin",sans-serif';ctx.textAlign='center';
+      ctx.fillStyle='#3d3428';
+      ctx.strokeStyle='rgba(253,249,238,.85)';ctx.lineWidth=4;
+      ctx.strokeText(G.place.n,tx,ty+18);
+      ctx.fillText(G.place.n,tx,ty+18);
+    }
+  }
+  requestAnimationFrame(draw);
+}
+draw();
+})();
+</script>
+<script>document.addEventListener("contextmenu",function(e){if(e.target&&e.target.tagName==="CANVAS")e.preventDefault()});</script>
+<a class="pgai-back" href="../index.html" aria-label="Torna a PlaygroundAI">&#9666; PlaygroundAI</a>
+<script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("/sw.js"))</script>

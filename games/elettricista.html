@@ -1,0 +1,679 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Corso di elettricista a moduli: lezioni, prove pratiche, verifiche e diploma finale. Gioca gratis su PlaygroundAI.">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3368917580765134" crossorigin="anonymous"></script>
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
+<title>Scuola dell'Elettricista</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Nunito:wght@600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{
+  --carta:#f2f5fa; --carta2:#e6ebf4; --card:#ffffff; --ink:#182338; --soft:#44506a; --dim:#8792a8;
+  --line:#d5dce8; --blu:#1547a8; --blu2:#0d2f73; --giallo:#ffc61a; --giallo2:#e0a800;
+  --ok:#1e9e5a; --no:#d84343; --viola:#6b4bd6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--carta);color:var(--ink);font-family:"Nunito",system-ui,sans-serif;line-height:1.55;
+  min-height:100vh;padding-bottom:40px}
+h1,h2,h3{font-family:"Archivo Black",sans-serif;font-weight:400;letter-spacing:.2px;text-wrap:balance;line-height:1.12}
+.wrap{width:min(1040px,94vw);margin-inline:auto}
+button{font-family:"Nunito",sans-serif;cursor:pointer}
+:focus-visible{outline:3px solid var(--giallo);outline-offset:2px;border-radius:4px}
+
+/* topbar */
+.top{background:var(--blu);color:#fff;padding:14px 0;box-shadow:0 4px 20px rgba(13,47,115,.25);position:sticky;top:0;z-index:20}
+.top .wrap{display:flex;align-items:center;gap:14px}
+.top .logo{font-family:"Archivo Black",sans-serif;font-size:1.15rem;display:flex;align-items:center;gap:10px}
+.top .logo .bolt{width:30px;height:30px;background:var(--giallo);border-radius:8px;display:grid;place-items:center;color:var(--blu2);font-size:18px}
+.prog{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:.8rem;font-weight:800}
+.prog .bar{width:min(220px,30vw);height:10px;background:rgba(255,255,255,.25);border-radius:99px;overflow:hidden}
+.prog .bar i{display:block;height:100%;background:var(--giallo);border-radius:99px;transition:width .5s}
+
+/* home */
+.hero{padding:38px 0 8px}
+.hero h1{font-size:clamp(1.6rem,4vw,2.6rem)}
+.hero p{color:var(--soft);max-width:62ch;margin-top:10px;font-weight:700}
+.mods{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:26px 0}
+.mod{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:20px;text-align:left;
+  display:flex;flex-direction:column;gap:8px;transition:transform .15s,box-shadow .2s,border-color .2s;position:relative}
+.mod:not(:disabled):hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(13,47,115,.12);border-color:var(--blu)}
+.mod:disabled{opacity:.55;cursor:not-allowed;filter:grayscale(.4)}
+.mod .em{font-size:30px}
+.mod .mn{font-family:"JetBrains Mono",monospace;font-size:.68rem;letter-spacing:.14em;color:var(--blu);font-weight:700}
+.mod h3{font-size:1.02rem;font-family:"Nunito";font-weight:900}
+.mod p{font-size:.8rem;color:var(--dim);font-weight:700}
+.mod .st{margin-top:auto;font-size:.74rem;font-weight:900;display:flex;align-items:center;gap:6px}
+.mod .st.done{color:var(--ok)}.mod .st.todo{color:var(--blu)}.mod .st.lock{color:var(--dim)}
+.mod.exam{grid-column:1/-1;background:linear-gradient(115deg,var(--blu),var(--blu2));color:#fff;border-color:var(--blu2)}
+.mod.exam p{color:#c9d6f2}.mod.exam .mn{color:var(--giallo)}
+.mod .badge{position:absolute;top:14px;right:14px;font-size:22px}
+
+/* schermata corso */
+.hd{display:flex;align-items:center;gap:12px;padding:26px 0 14px;flex-wrap:wrap}
+.hd .back{background:var(--card);border:2px solid var(--line);border-radius:10px;padding:8px 14px;font-weight:900;font-size:.85rem;color:var(--soft)}
+.hd .back:hover{border-color:var(--blu);color:var(--blu)}
+.hd h2{font-size:clamp(1.2rem,3vw,1.7rem)}
+.crumb{font-family:"JetBrains Mono",monospace;font-size:.7rem;letter-spacing:.12em;color:var(--dim);width:100%}
+.phase{display:flex;gap:8px;margin:6px 0 18px;flex-wrap:wrap}
+.phase span{font-size:.72rem;font-weight:900;letter-spacing:.06em;padding:6px 13px;border-radius:99px;
+  background:var(--carta2);color:var(--dim);border:2px solid transparent}
+.phase span.on{background:var(--giallo);color:#3a2c00}
+.phase span.ok{background:#d9f2e4;color:var(--ok)}
+
+.panel{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:30px;box-shadow:0 14px 40px rgba(13,47,115,.08)}
+.panel h3{font-size:1.25rem;margin-bottom:12px}
+.panel .body{color:var(--soft);font-weight:700;max-width:70ch}
+.panel .body p{margin:10px 0}
+.panel .body b{color:var(--ink)}
+.panel .body .hl{background:#fff3c8;padding:1px 6px;border-radius:5px;color:#6a5200}
+.formula{font-family:"JetBrains Mono",monospace;background:var(--blu2);color:#ffd95e;padding:14px 20px;border-radius:12px;
+  display:inline-block;font-size:1.2rem;font-weight:700;margin:10px 0}
+.notabox{border-left:5px solid var(--giallo);background:#fffbe8;border-radius:0 12px 12px 0;padding:12px 16px;margin:14px 0;font-size:.92rem}
+.dangerbox{border-left:5px solid var(--no);background:#fdeaea;border-radius:0 12px 12px 0;padding:12px 16px;margin:14px 0;font-size:.92rem}
+.nav-slide{display:flex;gap:10px;margin-top:24px;align-items:center}
+.btn{border:0;border-radius:12px;padding:13px 24px;font-weight:900;font-size:.95rem;transition:filter .15s,transform .07s}
+.btn.p{background:var(--blu);color:#fff;box-shadow:0 4px 0 var(--blu2)}
+.btn.y{background:var(--giallo);color:#3a2c00;box-shadow:0 4px 0 var(--giallo2)}
+.btn.g{background:var(--carta2);color:var(--soft);box-shadow:0 4px 0 var(--line)}
+.btn:hover{filter:brightness(1.06)}.btn:active{transform:translateY(3px)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.slidedots{margin-left:auto;font-family:"JetBrains Mono",monospace;font-size:.75rem;color:var(--dim);font-weight:700}
+.speak{background:none;border:2px solid var(--line);border-radius:99px;padding:7px 14px;font-size:.78rem;font-weight:900;color:var(--soft)}
+.speak:hover{border-color:var(--blu);color:var(--blu)}
+
+/* quiz */
+.qq{font-size:1.15rem;font-weight:900;margin-bottom:16px}
+.opts{display:grid;gap:10px}
+.opt{background:var(--carta);border:2px solid var(--line);border-radius:12px;padding:14px 18px;text-align:left;
+  font-weight:800;font-size:.95rem;color:var(--ink);transition:border-color .15s,background .15s}
+.opt:hover{border-color:var(--blu)}
+.opt.right{background:#d9f2e4;border-color:var(--ok);color:#0c5c34}
+.opt.wrong{background:#fdeaea;border-color:var(--no);color:#7c1d1d}
+.qmeta{display:flex;justify-content:space-between;margin-bottom:14px;font-family:"JetBrains Mono",monospace;font-size:.75rem;color:var(--dim);font-weight:700}
+.fb{margin-top:14px;font-weight:800;min-height:24px}
+.fb.ok{color:var(--ok)}.fb.no{color:var(--no)}
+
+/* pratiche */
+.lab{display:grid;gap:18px}
+.task{font-size:.85rem;font-weight:900;display:flex;gap:8px;align-items:center;color:var(--soft)}
+.task.done{color:var(--ok)}
+.task .tick{width:20px;height:20px;border-radius:6px;border:2px solid var(--line);display:grid;place-items:center;font-size:12px}
+.task.done .tick{background:var(--ok);border-color:var(--ok);color:#fff}
+.sliders{display:grid;gap:14px;max-width:430px}
+.sl{display:grid;grid-template-columns:110px 1fr 74px;gap:10px;align-items:center;font-weight:900;font-size:.85rem}
+.sl output{font-family:"JetBrains Mono",monospace;text-align:right;font-weight:700}
+.ohmres{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.amp{font-family:"JetBrains Mono",monospace;font-size:1.7rem;font-weight:700;background:var(--blu2);color:#7effc0;
+  padding:10px 20px;border-radius:12px}
+.bulb{width:64px;height:64px;border-radius:50%;background:#c8cdd8;position:relative;transition:background .2s,box-shadow .2s}
+.calcq{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-weight:800}
+.calcq input{width:90px;padding:10px;border:2px solid var(--line);border-radius:10px;font-family:"JetBrains Mono",monospace;font-size:1rem;text-align:center}
+.calcq input.ok{border-color:var(--ok);background:#d9f2e4}
+.pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.pk{background:var(--carta);border:2px solid var(--line);border-radius:14px;padding:14px 10px;text-align:center;font-weight:800;font-size:.82rem}
+.pk .e{font-size:28px;display:block;margin-bottom:6px}
+.pk.sel{border-color:var(--blu);background:#e8effc}
+.pk.right{border-color:var(--ok);background:#d9f2e4}
+.pk.wrong{border-color:var(--no);background:#fdeaea;animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.seq{display:grid;gap:10px}
+.seq .opt .n{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--carta2);
+  font-family:"JetBrains Mono",monospace;font-size:.8rem;margin-right:10px;color:var(--dim)}
+.seq .opt.done .n{background:var(--ok);color:#fff}
+.seq .opt.done{background:#d9f2e4;border-color:var(--ok);pointer-events:none}
+.mcols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mcols .col{display:grid;gap:10px;align-content:start}
+.mt{background:var(--carta);border:2px solid var(--line);border-radius:12px;padding:12px 14px;font-weight:800;font-size:.85rem;text-align:left}
+.mt.sel{border-color:var(--blu);background:#e8effc}
+.mt.done{border-color:var(--ok);background:#d9f2e4;pointer-events:none;opacity:.85}
+.mt.wrong{border-color:var(--no);animation:shake .3s}
+.circ{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cbox{background:var(--carta);border:2px solid var(--line);border-radius:14px;padding:16px;text-align:center}
+.cbox h4{font-size:.85rem;font-family:"JetBrains Mono",monospace;letter-spacing:.1em;color:var(--dim);margin-bottom:10px}
+.lamp{display:inline-block;width:38px;height:38px;border-radius:50%;background:#c8cdd8;margin:6px;position:relative;vertical-align:middle}
+.lamp.on{background:#ffd95e;box-shadow:0 0 22px #ffc61a}
+.sw{display:inline-block;border:2px solid var(--blu);color:var(--blu);border-radius:10px;padding:8px 14px;
+  font-weight:900;font-size:.8rem;background:#fff;margin:6px;cursor:pointer;vertical-align:middle}
+.sw.off{border-color:var(--no);color:var(--no)}
+.wires{display:grid;gap:12px;max-width:520px}
+.wrow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.wr{border-radius:12px;padding:13px;font-weight:900;font-size:.85rem;border:2px solid var(--line);background:var(--carta);text-align:center}
+.wr.sel{border-color:var(--blu);background:#e8effc}
+.wr.done{pointer-events:none;border-color:var(--ok)}
+.wr.c-marrone{border-left:14px solid #7a4a21}
+.wr.c-blu{border-left:14px solid #2b5cc8}
+.wr.c-gv{border-left:14px solid #3fa34d;border-image:repeating-linear-gradient(45deg,#3fa34d 0 8px,#ffd21a 8px 16px) 14}
+.diploma{text-align:center;padding:46px 30px;border:6px double var(--blu);border-radius:20px;background:#fffdf4;position:relative}
+.diploma .sigil{font-size:52px}
+.diploma h2{font-size:clamp(1.6rem,4vw,2.4rem);color:var(--blu2);margin:8px 0}
+.diploma .nome{font-family:"Archivo Black",sans-serif;font-size:clamp(1.3rem,3.4vw,2rem);color:var(--ink);margin:14px 0;border-bottom:3px solid var(--giallo);display:inline-block;padding:0 20px 6px}
+.diploma p{color:var(--soft);font-weight:700;max-width:52ch;margin:6px auto}
+.diploma .data{font-family:"JetBrains Mono",monospace;font-size:.8rem;color:var(--dim);margin-top:16px}
+.nameask input{padding:13px 18px;border:2px solid var(--line);border-radius:12px;font-size:1.05rem;font-weight:800;width:min(340px,80vw);text-align:center}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
+.big-result{text-align:center;padding:20px 0}
+.big-result .pct{font-family:"Archivo Black",sans-serif;font-size:3rem}
+.pass .pct{color:var(--ok)}.fail .pct{color:var(--no)}
+@media (max-width:840px){.mods{grid-template-columns:1fr 1fr}.circ,.mcols{grid-template-columns:1fr}}
+@media (max-width:560px){.mods{grid-template-columns:1fr}.panel{padding:20px}}
+@media (prefers-reduced-motion:reduce){.pk.wrong,.mt.wrong{animation:none}}
+
+html,body{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.pgai-back{position:fixed;bottom:12px;right:12px;z-index:999;font-family:system-ui,sans-serif;font-weight:700;font-size:12px;color:#fff;background:rgba(15,17,28,.78);border:1px solid rgba(255,255,255,.28);padding:8px 13px;border-radius:99px;text-decoration:none;backdrop-filter:blur(6px)}
+.pgai-back:hover{background:rgba(70,80,120,.85)}
+@media (max-width:700px){body{overflow:auto;height:auto;min-height:100vh}.head{flex-wrap:wrap;gap:8px}.hud{margin-left:0;width:100%;justify-content:space-between;flex-wrap:wrap;gap:8px}.foot{flex-wrap:wrap;gap:8px}}
+
+</style>
+</head>
+<body>
+
+<div class="top"><div class="wrap">
+ <div class="logo"><span class="bolt">⚡</span>Scuola dell'Elettricista</div>
+ <div class="prog"><span id="pTxt">0/7</span><div class="bar"><i id="pBar"></i></div></div>
+</div></div>
+
+<div class="wrap" id="app"></div>
+<canvas class="confetti" id="cf"></canvas>
+
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+const app=document.getElementById("app");
+
+/* ---------- audio ---------- */
+let ac=null;
+function A(){if(!ac)ac=new(window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();return ac}
+function tone(f,d,ty,v){try{const c=A(),t=c.currentTime,o=c.createOscillator(),g=c.createGain();
+  o.type=ty||"sine";o.frequency.value=f;g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(v||0.08,t+0.01);g.gain.exponentialRampToValueAtTime(0.0005,t+d);
+  o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+d+0.05)}catch(e){}}
+const sOk=()=>{tone(660,0.12,"triangle",0.09);setTimeout(()=>tone(990,0.18,"triangle",0.09),90)};
+const sNo=()=>tone(160,0.3,"sawtooth",0.07);
+const sClick=()=>tone(500,0.05,"square",0.03);
+const sBadge=()=>[523,659,784,1046].forEach((f,i)=>setTimeout(()=>tone(f,0.35,"triangle",0.09),i*140));
+
+/* ---------- voce ---------- */
+let speaking=false;
+function speak(txt){try{
+  if(speaking){speechSynthesis.cancel();speaking=false;return}
+  const u=new SpeechSynthesisUtterance(txt);u.lang="it-IT";u.rate=1.02;
+  u.onend=()=>speaking=false;speechSynthesis.cancel();speechSynthesis.speak(u);speaking=true;
+}catch(e){}}
+
+/* ---------- stato ---------- */
+const KEY="scuolaElettricista";
+let S={done:[false,false,false,false,false,false],exam:false,nome:""};
+try{const raw=localStorage.getItem(KEY);if(raw)S=Object.assign(S,JSON.parse(raw))}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function doneCount(){return S.done.filter(Boolean).length+(S.exam?1:0)}
+function syncProg(){$("#pTxt").textContent=doneCount()+"/7";
+  $("#pBar").style.width=(doneCount()/7*100)+"%"}
+
+/* ---------- contenuti del corso ---------- */
+const MOD=[
+{em:"⚡",tit:"Le basi dell'elettricità",sub:"Volt, Ampere, Ohm e la legge che governa tutto",
+ slides:[
+  {t:"Cos'è la corrente elettrica",h:`<p>L'elettricità è un <b>flusso di elettroni</b> che si muove dentro un materiale. Nei <b>conduttori</b> (rame, alluminio, oro) gli elettroni scorrono facilmente; negli <b>isolanti</b> (plastica, gomma, vetro, legno asciutto) restano fermi.</p><p>Per questo i cavi hanno <span class="hl">l'anima di rame</span> e <span class="hl">la guaina di plastica</span>: dentro la corrente passa, fuori no.</p>`},
+  {t:"Le tre grandezze fondamentali",h:`<p>Immagina un tubo dell'acqua:</p><p>🔵 <b>TENSIONE (Volt, V)</b> — la <i>spinta</i> che muove gli elettroni, come la pressione dell'acqua.<br>🔴 <b>CORRENTE (Ampere, A)</b> — <i>quanti</i> elettroni passano ogni secondo, come i litri che scorrono.<br>🟡 <b>RESISTENZA (Ohm, Ω)</b> — l'<i>ostacolo</i> al passaggio, come un tubo stretto.</p><div class="notabox">💡 La presa di casa in Italia ha una tensione di <b>230 volt</b>.</div>`},
+  {t:"La legge di Ohm",h:`<p>Le tre grandezze sono legate dalla legge più importante dell'elettrotecnica:</p><div class="formula">I = V ÷ R</div><p>La corrente (I) è uguale alla tensione (V) divisa per la resistenza (R).<br>Esempio: 12 volt su una resistenza di 6 ohm → <b>12 ÷ 6 = 2 ampere</b>.</p><p>E la potenza? <span class="hl">P = V × I</span>, si misura in <b>watt (W)</b>: è quella scritta sulle lampadine e sugli elettrodomestici.</p>`}],
+ quiz:[
+  {q:"Cosa misura il volt?",o:["La tensione, la «spinta» degli elettroni","La corrente che scorre","La resistenza del materiale","La potenza di una lampadina"],c:0},
+  {q:"La legge di Ohm dice che…",o:["I = V ÷ R","V = I ÷ R","R = V × I","I = R ÷ V"],c:0},
+  {q:"Se aumento la resistenza (stessa tensione), la corrente…",o:["Diminuisce","Aumenta","Resta uguale","Diventa tensione"],c:0},
+  {q:"In quale unità si misura la corrente?",o:["Ampere","Volt","Ohm","Watt"],c:0},
+  {q:"Un materiale che NON lascia passare la corrente si chiama…",o:["Isolante (es. plastica)","Conduttore (es. rame)","Resistore","Neutro"],c:0}]},
+
+{em:"🦺",tit:"La sicurezza prima di tutto",sub:"DPI e le 5 regole d'oro: si impara PRIMA di toccare",
+ slides:[
+  {t:"Perché la sicurezza viene prima",h:`<p>La corrente <b>non si vede, non si sente e non ha odore</b>: te ne accorgi solo quando ti attraversa. E bastano <b>pochi milliampere</b> (circa 30 mA, meno di quelli di una lampadina!) per essere in pericolo di vita.</p><div class="dangerbox">⛔ Regola assoluta dello studente: <b>mai lavorare su un impianto vero</b>. A scuola si fa pratica solo su kit didattici a bassissima tensione, con l'insegnante.</div>`},
+  {t:"I DPI — Dispositivi di Protezione Individuale",h:`<p>L'elettricista si veste da elettricista:</p><p>🧤 <b>Guanti isolanti</b> (e mani sempre asciutte!)<br>🥽 <b>Occhiali di protezione</b> contro scintille e schegge<br>👢 <b>Scarpe con suola isolante</b><br>⛑️ <b>Elmetto</b> nei cantieri<br>🪛 <b>Attrezzi isolati fino a 1000 V</b></p><p>E mai addosso: <span class="hl">anelli, bracciali, collane</span> — il metallo conduce!</p>`},
+  {t:"Le 5 regole d'oro",h:`<p>Prima di QUALSIASI lavoro elettrico, nell'ordine:</p><p><b>1️⃣ Sezionare</b> — togliere la tensione (staccare l'interruttore generale)<br><b>2️⃣ Bloccare il reinserimento</b> — assicurarsi che nessuno riattacchi la corrente (lucchetto, cartello)<br><b>3️⃣ Verificare l'assenza di tensione</b> — con il tester: fidarsi è bene, misurare è meglio<br><b>4️⃣ Mettere a terra e in cortocircuito</b> — sugli impianti grandi<br><b>5️⃣ Delimitare la zona di lavoro</b> — proteggere e segnalare</p>`},
+  {t:"Chi può lavorare sull'elettricità",h:`<p>I lavori elettrici veri sono riservati a persone <b>formate e qualificate</b>: la norma CEI 11-27 definisce chi è <b>PES</b> (Persona ESperta) e <b>PAV</b> (Persona AVvertita).</p><p>Il percorso di questo corso ti porta esattamente lì: <span class="hl">prima le conoscenze, poi la pratica guidata, poi la qualifica</span>.</p>`}],
+ quiz:[
+  {q:"Qual è la PRIMA regola d'oro prima di un lavoro elettrico?",o:["Sezionare: togliere la tensione","Mettersi i guanti","Delimitare la zona","Chiamare un collega"],c:0},
+  {q:"Perché si verifica l'assenza di tensione col tester anche dopo aver staccato?",o:["Perché fidarsi non basta: si misura sempre","Per scaldare il tester","È facoltativo","Per controllare la batteria del tester"],c:0},
+  {q:"Guanti bagnati durante un lavoro elettrico:",o:["Mai: l'acqua conduce la corrente","Va bene se sono di gomma","Solo d'estate","Meglio, fanno più presa"],c:0},
+  {q:"Da quanti milliampere la corrente diventa pericolosa per il corpo?",o:["Già da circa 30 mA","Solo sopra 100 A","Solo sopra 10 A","La corrente non è mai pericolosa"],c:0},
+  {q:"Uno studente può lavorare su una presa di casa vera?",o:["No: solo kit didattici a bassissima tensione con l'insegnante","Sì, se sta attento","Sì, con i guanti","Sì, di giorno"],c:0}]},
+
+{em:"🧰",tit:"Gli attrezzi del mestiere",sub:"Multimetro, cercafase, spellafili: conoscili uno a uno",
+ slides:[
+  {t:"Il multimetro: l'occhio dell'elettricista",h:`<p>Il <b>multimetro (tester)</b> è lo strumento principe: misura <b>tensione</b> (V), <b>corrente</b> (A) e <b>resistenza</b> (Ω). Con lui «vedi» quello che nei fili non si vede.</p><p>Il <b>cercafase</b> invece è un cacciavite speciale con una lampadina: appoggiato a un filo, <span class="hl">si illumina se c'è tensione</span>.</p>`},
+  {t:"Gli attrezzi da taglio e giunzione",h:`<p>✂️ <b>Spellafili</b> — toglie la guaina di plastica senza rovinare il rame<br>🔧 <b>Pinza universale</b> — afferra, piega e taglia<br>🪛 <b>Cacciaviti isolati 1000 V</b> — con l'impugnatura certificata<br>🔗 <b>Morsetti (Wago)</b> — giuntano i fili in modo sicuro, niente nastro avvolto a caso<br>🎗️ <b>Nastro isolante</b> — protegge e segnala</p><div class="notabox">💡 Un attrezzo da elettricista si riconosce dal simbolo <b>1000 V</b> e dal doppio triangolo sull'impugnatura.</div>`}],
+ quiz:[
+  {q:"Cosa misura un multimetro?",o:["Tensione, corrente e resistenza","Solo la temperatura","Solo i watt","Il peso dei cavi"],c:0},
+  {q:"Per togliere la guaina a un filo senza rovinare il rame uso…",o:["Lo spellafili","I denti","Le forbici da cucina","Il martello"],c:0},
+  {q:"Il cercafase serve a…",o:["Capire se un filo è in tensione","Cercare i fili nel muro","Misurare la resistenza","Avvitare più forte"],c:0},
+  {q:"I cacciaviti da elettricista sono…",o:["Isolati fino a 1000 V","Di metallo pieno","Magnetici e basta","Uguali a tutti gli altri"],c:0},
+  {q:"I morsetti tipo Wago servono a…",o:["Giuntare i fili in modo sicuro","Appendere i quadri","Tagliare i cavi","Decorare l'impianto"],c:0}]},
+
+{em:"🔌",tit:"Circuiti e schemi",sub:"Serie, parallelo e come si legge uno schema elettrico",
+ slides:[
+  {t:"Il circuito elettrico",h:`<p>Un circuito è un <b>anello chiuso</b>: generatore → filo → utilizzatore (lampada) → filo → ritorno al generatore. Se l'anello si apre (interruttore aperto, filo staccato), <span class="hl">la corrente si ferma</span>.</p><p><b>Circuito chiuso</b> = corrente che scorre = lampada accesa.<br><b>Circuito aperto</b> = niente corrente = lampada spenta.</p>`},
+  {t:"Serie e parallelo",h:`<p>🔗 <b>IN SERIE</b>: gli utilizzatori sono in fila sullo stesso anello. La corrente è una sola: <span class="hl">se una lampada si brucia, si spengono tutte</span> (come le vecchie lucine di Natale).</p><p>🪜 <b>IN PARALLELO</b>: ogni utilizzatore ha il suo ramo. Tutti ricevono la stessa tensione e sono <span class="hl">indipendenti</span>: le prese e le luci di casa sono in parallelo.</p>`},
+  {t:"Leggere gli schemi",h:`<p>Gli elettricisti parlano a simboli: una <b>linea lunga + una corta</b> è la batteria, un <b>cerchio con la croce</b> è la lampada, una <b>linea interrotta</b> è l'interruttore, un <b>rastrello</b> è la terra.</p><p>E il <b>deviatore</b>? È l'interruttore «doppio» che permette di accendere la stessa lampada <span class="hl">da due punti diversi</span> — come in cima e in fondo alle scale.</p>`}],
+ quiz:[
+  {q:"«Circuito aperto» significa che…",o:["La corrente non passa","La corrente passa più veloce","C'è un cortocircuito","La lampada è più luminosa"],c:0},
+  {q:"In un circuito in SERIE, se una lampada si brucia…",o:["Si spengono tutte","Le altre restano accese","Le altre si accendono di più","Scatta la terra"],c:0},
+  {q:"Le prese di casa sono collegate…",o:["In parallelo","In serie","A caso","In triangolo"],c:0},
+  {q:"Il deviatore serve a…",o:["Comandare una lampada da due punti diversi","Aumentare la tensione","Proteggere dai fulmini","Misurare la corrente"],c:0},
+  {q:"Nello schema, una linea lunga e una corta affiancate sono…",o:["La batteria (il generatore)","La lampada","La terra","Il fusibile"],c:0}]},
+
+{em:"🏠",tit:"L'impianto di casa",sub:"Quadro, salvavita, colori dei fili e messa a terra",
+ slides:[
+  {t:"Il quadro elettrico",h:`<p>Il quadro è il <b>cervello dell'impianto</b>. Dentro trovi:</p><p>🛡️ <b>Interruttore magnetotermico</b> — scatta per <b>sovraccarico</b> (troppi apparecchi) o <b>cortocircuito</b><br>❤️ <b>Interruttore differenziale («salvavita»)</b> — scatta in <b>30 millisecondi</b> se la corrente «si disperde», per esempio attraverso una persona</p><div class="notabox">💡 Il salvavita va provato ogni tanto col suo tasto <b>T</b>: se scatta, funziona.</div>`},
+  {t:"I colori dei fili",h:`<p>In un impianto a norma i colori sono un linguaggio:</p><p>🟤 <b>FASE</b> — marrone (o nero/grigio): il filo «attivo», quello che porta la tensione<br>🔵 <b>NEUTRO</b> — blu: il ritorno della corrente<br>🟢🟡 <b>TERRA</b> — giallo-verde: la via di fuga di sicurezza</p><div class="dangerbox">⛔ Il giallo-verde è SOLO per la terra: <b>mai</b> usarlo come fase o neutro. È una regola di legge, non un consiglio.</div>`},
+  {t:"La messa a terra",h:`<p>Se un filo interno tocca la carcassa metallica di una lavatrice, la corrente «cerca una strada». La <b>messa a terra</b> gliela offre: un percorso diretto verso il terreno, <span class="hl">più comodo del corpo umano</span>.</p><p>Terra + differenziale insieme = la coppia che salva la vita: la terra dà la via di fuga, il differenziale se ne accorge e stacca tutto.</p>`}],
+ quiz:[
+  {q:"Il filo giallo-verde è…",o:["La terra, e solo la terra","La fase","Il neutro","Un filo decorativo"],c:0},
+  {q:"Di che colore è il neutro?",o:["Blu","Marrone","Rosso","Giallo-verde"],c:0},
+  {q:"Il differenziale («salvavita») scatta quando…",o:["La corrente si disperde, per esempio verso una persona","Accendi troppe luci","C'è un temporale","La bolletta è alta"],c:0},
+  {q:"Il magnetotermico protegge da…",o:["Sovraccarichi e cortocircuiti","Dispersioni verso terra","Blackout del gestore","Fulmini"],c:0},
+  {q:"Si può usare il filo di terra come fase «per fare prima»?",o:["Mai: è vietato e pericolosissimo","Sì, se è corto","Sì, nei garage","Solo d'inverno"],c:0}]},
+
+{em:"🎓",tit:"Diventare elettricista",sub:"Il percorso vero: scuola, apprendistato, qualifica, abilitazione",
+ slides:[
+  {t:"Passo 1 — La scuola",h:`<p>Si parte dai banchi: <b>istituto professionale</b> (indirizzo elettrico-elettronico) o <b>istituto tecnico</b> (elettrotecnica), oppure un <b>corso di formazione professionale regionale</b>. Qui impari la teoria che hai visto in questo corso — ma molto più a fondo — e fai laboratorio su banchi didattici.</p>`},
+  {t:"Passo 2 — L'apprendistato",h:`<p>Il mestiere si impara <b>in bottega</b>: l'apprendistato in un'azienda o con un artigiano ti mette le mani (protette!) sugli impianti veri, accanto a un elettricista esperto. Si comincia dai lavori semplici e si cresce.</p><p>Intanto arrivano le qualifiche di sicurezza: <span class="hl">PES/PAV secondo la norma CEI 11-27</span>.</p>`},
+  {t:"Passo 3 — L'abilitazione",h:`<p>Per firmare un impianto serve l'<b>abilitazione professionale</b>: in Italia la regola è il <span class="hl">D.M. 37/2008</span>, che richiede titolo di studio + anni di esperienza documentata. Solo allora puoi rilasciare la <b>Dichiarazione di Conformità</b> — il documento che certifica che l'impianto è a norma.</p>`},
+  {t:"Passo 4 — Il tuo futuro",h:`<p>Da lì scegli la tua strada: <b>dipendente</b> in un'azienda di impianti, oppure <b>artigiano</b> con la tua attività. E le specializzazioni non finiscono mai: <span class="hl">domotica, fotovoltaico, impianti industriali, ricarica auto elettriche</span>…</p><p>⚡ L'elettricista è uno dei mestieri più richiesti che ci siano. Il mondo funziona a corrente: qualcuno la deve saper domare.</p>`}],
+ quiz:[
+  {q:"Qual è il primo passo del percorso?",o:["Scuola a indirizzo elettrico o corso professionale","Aprire subito la partita IVA","Comprare gli attrezzi","Firmare impianti"],c:0},
+  {q:"A cosa serve l'apprendistato?",o:["A imparare il mestiere lavorando con un esperto","A saltare la scuola","Ad andare in vacanza","A studiare da soli"],c:0},
+  {q:"PES e PAV sono…",o:["Qualifiche di sicurezza per i lavori elettrici (CEI 11-27)","Tipi di cavo","Marche di attrezzi","Sigle del contatore"],c:0},
+  {q:"Per firmare la Dichiarazione di Conformità di un impianto serve…",o:["L'abilitazione secondo il D.M. 37/2008","Solo la buona volontà","Un cacciavite isolato","L'assenso del vicino"],c:0},
+  {q:"Un elettricista può specializzarsi in…",o:["Domotica, fotovoltaico, industriale: tutte queste","Solo lampadine","Solo citofoni","Niente, il mestiere è finito"],c:0}]}
+];
+
+const EXAM=[
+ {q:"V = 230 volt, R = 115 ohm. Quanta corrente passa?",o:["2 ampere","0,5 ampere","115 ampere","230 ampere"],c:0},
+ {q:"La PRIMA cosa da fare prima di un lavoro elettrico:",o:["Sezionare: togliere la tensione","Mettere il nastro isolante","Aprire la finestra","Indossare l'elmetto"],c:0},
+ {q:"Il filo di TERRA è di colore…",o:["Giallo-verde","Blu","Marrone","Rosso"],c:0},
+ {q:"Le luci di casa sono collegate tra loro…",o:["In parallelo","In serie","In diagonale","A cascata"],c:0},
+ {q:"Il «salvavita» (differenziale) protegge soprattutto…",o:["Le persone dalle dispersioni di corrente","I mobili dai graffi","L'impianto dai fulmini","Il contatore dal gestore"],c:0},
+ {q:"La corrente si misura in…",o:["Ampere","Volt","Ohm","Metri"],c:0},
+ {q:"Per spellare un filo si usa…",o:["Lo spellafili","La fiamma","Le unghie","Il cercafase"],c:0},
+ {q:"Accendere la stessa lampada da due punti richiede…",o:["Due deviatori","Due prese","Due salvavita","Due lampade"],c:0},
+ {q:"Chi può firmare la conformità di un impianto?",o:["Un installatore abilitato (D.M. 37/2008)","Chiunque abbia un tester","Il proprietario di casa","Un amico pratico"],c:0},
+ {q:"La plastica intorno ai cavi è…",o:["Un isolante","Un conduttore","Un fusibile","Una resistenza"],c:0}
+];
+
+/* ---------- confetti ---------- */
+const cf=document.getElementById("cf"),cx=cf.getContext("2d");let confs=[];
+function fitCf(){cf.width=innerWidth;cf.height=innerHeight}fitCf();addEventListener("resize",fitCf);
+function party(n){for(let i=0;i<(n||120);i++)confs.push({x:Math.random()*cf.width,y:-20-Math.random()*200,
+  vy:2+Math.random()*3,vx:(Math.random()-.5)*2,r:4+Math.random()*5,h:Math.random()*360,a:Math.random()*6})}
+(function cfl(){cx.clearRect(0,0,cf.width,cf.height);
+  for(let i=confs.length-1;i>=0;i--){const c=confs[i];c.y+=c.vy;c.x+=c.vx;c.a+=0.1;
+    if(c.y>cf.height+20){confs.splice(i,1);continue}
+    cx.save();cx.translate(c.x,c.y);cx.rotate(c.a);cx.fillStyle="hsl("+c.h+",85%,55%)";
+    cx.fillRect(-c.r/2,-c.r/2,c.r,c.r*1.4);cx.restore()}
+  requestAnimationFrame(cfl)})();
+
+/* ---------- shuffle ---------- */
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[a[i],a[j]]=[a[j],a[i]]}return a}
+function shuffleQuiz(qs){return shuffle(qs).map(q=>{
+  const idx=shuffle(q.o.map((_,i)=>i));
+  return {q:q.q,o:idx.map(i=>q.o[i]),c:idx.indexOf(q.c)}})}
+
+/* ---------- HOME ---------- */
+function home(){
+  speechSynthesis.cancel();speaking=false;
+  syncProg();
+  const allDone=S.done.every(Boolean);
+  let cards="";
+  MOD.forEach((m,i)=>{
+    const unlocked=i===0||S.done[i-1];
+    const st=S.done[i]?'<span class="st done">✔ Completato</span>':
+      unlocked?'<span class="st todo">▶ Inizia il modulo</span>':'<span class="st lock">🔒 Completa il modulo precedente</span>';
+    cards+=`<button class="mod" data-m="${i}" ${unlocked?"":"disabled"}>
+      ${S.done[i]?'<span class="badge">🏅</span>':""}
+      <span class="em">${m.em}</span><span class="mn">MODULO ${i+1} / 6</span>
+      <h3>${m.tit}</h3><p>${m.sub}</p>${st}</button>`;
+  });
+  cards+=`<button class="mod exam" id="examBtn" ${allDone?"":"disabled"}>
+    ${S.exam?'<span class="badge">🎓</span>':""}
+    <span class="em">📜</span><span class="mn">PROVA FINALE</span>
+    <h3>Esame da Elettricista</h3>
+    <p>${S.exam?"Superato! Rivedi il tuo diploma.":allDone?"10 domande su tutto il corso. Ti servono 8 risposte giuste.":"Si sblocca completando tutti e 6 i moduli."}</p>
+    <span class="st ${S.exam?"done":allDone?"todo":"lock"}">${S.exam?"✔ Diploma ottenuto":allDone?"▶ Affronta l'esame":"🔒 Bloccato"}</span></button>`;
+  app.innerHTML=`<div class="hero">
+    <h1>Da zero a elettricista, un modulo alla volta. 🛠️</h1>
+    <p>Sei moduli: in ognuno c'è una <b>lezione</b>, una <b>prova pratica</b> e una <b>verifica</b>. Superali tutti, poi affronta l'esame finale e prenditi il diploma. I lavori elettrici veri restano ai professionisti — qui si impara come diventarlo.</p>
+   </div><div class="mods">${cards}</div>`;
+  app.querySelectorAll(".mod[data-m]").forEach(b=>b.addEventListener("click",()=>{sClick();lesson(+b.dataset.m,0)}));
+  const eb=document.getElementById("examBtn");
+  if(eb&&!eb.disabled)eb.addEventListener("click",()=>{sClick();S.exam?diploma():exam()});
+}
+
+/* ---------- header di modulo ---------- */
+function modHead(i,phase){
+  const names=["LEZIONE","PRATICA","VERIFICA"];
+  const chips=names.map((n,k)=>`<span class="${k===phase?"on":k<phase?"ok":""}">${k<phase?"✔ ":""}${n}</span>`).join("");
+  return `<div class="hd"><button class="back" id="bk">← Corso</button>
+    <h2>${MOD[i].em} ${MOD[i].tit}</h2>
+    <span class="crumb">MODULO ${i+1} DI 6 — ${MOD[i].sub}</span></div>
+    <div class="phase">${chips}</div>`;
+}
+function bindBack(){document.getElementById("bk").addEventListener("click",()=>{sClick();home()})}
+
+/* ---------- LEZIONE ---------- */
+function lesson(i,s){
+  speechSynthesis.cancel();speaking=false;
+  const sl=MOD[i].slides,cur=sl[s];
+  app.innerHTML=modHead(i,0)+`<div class="panel">
+    <h3>${cur.t}</h3><div class="body" id="slbody">${cur.h}</div>
+    <div class="nav-slide">
+      <button class="btn g" id="prev" ${s===0?"disabled":""}>← Indietro</button>
+      <button class="btn p" id="next">${s===sl.length-1?"Vai alla pratica →":"Avanti →"}</button>
+      <button class="speak" id="spk">🔊 Leggi ad alta voce</button>
+      <span class="slidedots">${s+1} / ${sl.length}</span>
+    </div></div>`;
+  bindBack();
+  document.getElementById("prev").addEventListener("click",()=>{sClick();lesson(i,s-1)});
+  document.getElementById("next").addEventListener("click",()=>{sClick();
+    s===sl.length-1?practice(i):lesson(i,s+1)});
+  document.getElementById("spk").addEventListener("click",()=>{
+    speak(cur.t+". "+document.getElementById("slbody").textContent)});
+}
+
+/* ---------- PRATICA (una per modulo) ---------- */
+function practice(i){
+  speechSynthesis.cancel();speaking=false;
+  app.innerHTML=modHead(i,1)+`<div class="panel"><h3 id="pTit"></h3>
+    <div class="body" style="margin-bottom:16px" id="pIntro"></div>
+    <div class="lab" id="lab"></div>
+    <div class="nav-slide"><button class="btn y" id="toQuiz" disabled>Pratica completata → Verifica</button></div></div>`;
+  bindBack();
+  const lab=document.getElementById("lab"),tq=document.getElementById("toQuiz");
+  const unlock=()=>{tq.disabled=false;sBadge();party(50)};
+  tq.addEventListener("click",()=>{sClick();quiz(i)});
+  [prac1,prac2,prac3,prac4,prac5,prac6][i](lab,unlock,
+    t=>document.getElementById("pTit").textContent=t,
+    h=>document.getElementById("pIntro").innerHTML=h);
+}
+
+/* P1: laboratorio di Ohm */
+function prac1(lab,unlock,setT,setI){
+  setT("Laboratorio della legge di Ohm");
+  setI("Muovi le manopole e guarda la lampadina: poi risolvi i tre calcoli. <b>I = V ÷ R</b>");
+  lab.innerHTML=`<div class="sliders">
+    <div class="sl"><span>Tensione V</span><input type="range" id="rv" min="1" max="24" value="12"><output id="ov">12 V</output></div>
+    <div class="sl"><span>Resistenza R</span><input type="range" id="rr" min="1" max="24" value="12"><output id="or">12 Ω</output></div>
+   </div>
+   <div class="ohmres"><div class="amp" id="amp">1.00 A</div><div class="bulb" id="bulb"></div>
+     <div class="task" id="t0"><span class="tick">✔</span>Porta la corrente tra 1,9 e 2,1 A</div></div>
+   <div class="calcq" id="c1"><span>1) V = 12 V, R = 4 Ω → I =</span><input inputmode="decimal" id="i1"><span>A</span></div>
+   <div class="calcq" id="c2"><span>2) V = 230 V, R = 46 Ω → I =</span><input inputmode="decimal" id="i2"><span>A</span></div>
+   <div class="calcq" id="c3"><span>3) V = 9 V, I = 3 A → R =</span><input inputmode="decimal" id="i3"><span>Ω</span></div>`;
+  const st={slider:false,c1:false,c2:false,c3:false};
+  function chk(){if(st.slider&&st.c1&&st.c2&&st.c3)unlock()}
+  const rv=document.getElementById("rv"),rr=document.getElementById("rr");
+  function upd(){const V=+rv.value,R=+rr.value,I=V/R;
+    document.getElementById("ov").textContent=V+" V";
+    document.getElementById("or").textContent=R+" Ω";
+    document.getElementById("amp").textContent=I.toFixed(2)+" A";
+    const b=document.getElementById("bulb"),k=Math.min(1,I/3);
+    b.style.background=`rgb(${200+55*k},${205+50*k-k*60},${216-k*160})`;
+    b.style.boxShadow=k>0.2?`0 0 ${30*k}px rgba(255,198,26,${k})`:"none";
+    if(I>=1.9&&I<=2.1&&!st.slider){st.slider=true;document.getElementById("t0").classList.add("done");sOk();chk()}}
+  rv.addEventListener("input",upd);rr.addEventListener("input",upd);upd();
+  [["i1",3,"c1"],["i2",5,"c2"],["i3",3,"c3"]].forEach(([id,ans,key])=>{
+    const inp=document.getElementById(id);
+    inp.addEventListener("input",()=>{const v=parseFloat(inp.value.replace(",","."));
+      if(v===ans&&!st[key]){st[key]=true;inp.classList.add("ok");inp.disabled=true;sOk();chk()}});
+  });
+}
+
+/* P2: DPI + 5 regole */
+function prac2(lab,unlock,setT,setI){
+  setT("Vesti l'elettricista, poi metti in fila le 5 regole d'oro");
+  setI("Prima scegli <b>solo</b> ciò che un elettricista deve indossare o usare. Poi tocca le 5 regole nell'ordine giusto.");
+  const items=[["🧤","Guanti isolanti",true],["🥽","Occhiali di protezione",true],["👢","Scarpe isolanti",true],
+    ["⛑️","Elmetto",true],["🪛","Cacciavite isolato 1000 V",true],
+    ["💍","Anello d'oro",false],["🎧","Cuffie con la musica",false],["🧤","Guanti bagnati",false],["📿","Collana metallica",false]];
+  const rules=["Sezionare: togliere la tensione","Bloccare il reinserimento","Verificare l'assenza di tensione","Mettere a terra e in cortocircuito","Delimitare la zona di lavoro"];
+  lab.innerHTML=`<div class="pick" id="pick">${shuffle(items).map((it,k)=>
+     `<button class="pk" data-ok="${it[2]}"><span class="e">${it[0]}</span>${it[1]}</button>`).join("")}</div>
+   <div><button class="btn p" id="vest">Controlla l'equipaggiamento</button></div>
+   <div id="seqWrap" style="display:none"><div class="task" style="margin-bottom:10px"><span class="tick">✔</span>Ora tocca le regole nell'ordine giusto (1 → 5)</div>
+   <div class="seq" id="seq">${shuffle(rules.map((r,k)=>[r,k])).map(([r,k])=>
+     `<button class="opt" data-k="${k}"><span class="n">?</span>${r}</button>`).join("")}</div></div>`;
+  lab.querySelectorAll(".pk").forEach(b=>b.addEventListener("click",()=>{sClick();b.classList.toggle("sel")}));
+  document.getElementById("vest").addEventListener("click",()=>{
+    let good=true;
+    lab.querySelectorAll(".pk").forEach(b=>{
+      const ok=b.dataset.ok==="true",sel=b.classList.contains("sel");
+      b.classList.remove("right","wrong");
+      if(sel&&ok)b.classList.add("right");
+      if(sel&&!ok){b.classList.add("wrong");good=false}
+      if(!sel&&ok)good=false;});
+    if(good){sOk();document.getElementById("vest").style.display="none";
+      lab.querySelectorAll(".pk").forEach(b=>b.style.pointerEvents="none");
+      document.getElementById("seqWrap").style.display="block"}
+    else sNo();});
+  let next=0;
+  lab.addEventListener("click",e=>{
+    const b=e.target.closest(".seq .opt");if(!b||b.classList.contains("done"))return;
+    if(+b.dataset.k===next){b.classList.add("done");b.querySelector(".n").textContent=++next;sOk();
+      if(next===5)unlock()}
+    else{sNo();b.classList.add("wrong");setTimeout(()=>b.classList.remove("wrong"),350)}});
+}
+
+/* P3: abbina attrezzo→uso */
+function prac3(lab,unlock,setT,setI){
+  setT("Ogni attrezzo al suo posto");
+  setI("Tocca un attrezzo a sinistra, poi il suo uso a destra. Sei coppie e la cassetta è pronta.");
+  const pairs=[["🔎 Multimetro","Misurare tensione, corrente e resistenza"],
+    ["🖊️ Cercafase","Capire se un filo è in tensione"],
+    ["✂️ Spellafili","Togliere la guaina senza rovinare il rame"],
+    ["🪛 Cacciavite isolato","Avvitare in sicurezza fino a 1000 V"],
+    ["🔗 Morsetti Wago","Giuntare i fili in modo sicuro"],
+    ["🎗️ Nastro isolante","Proteggere e segnalare una giunzione"]];
+  const L=shuffle(pairs.map((p,k)=>[p[0],k])),R=shuffle(pairs.map((p,k)=>[p[1],k]));
+  lab.innerHTML=`<div class="mcols">
+    <div class="col" id="cl">${L.map(([t,k])=>`<button class="mt" data-k="${k}">${t}</button>`).join("")}</div>
+    <div class="col" id="cr">${R.map(([t,k])=>`<button class="mt" data-k="${k}">${t}</button>`).join("")}</div></div>`;
+  let selL=null,done=0;
+  document.getElementById("cl").addEventListener("click",e=>{const b=e.target.closest(".mt");
+    if(!b||b.classList.contains("done"))return;sClick();
+    lab.querySelectorAll("#cl .mt").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");selL=b});
+  document.getElementById("cr").addEventListener("click",e=>{const b=e.target.closest(".mt");
+    if(!b||b.classList.contains("done")||!selL)return;
+    if(b.dataset.k===selL.dataset.k){b.classList.add("done");selL.classList.add("done");selL.classList.remove("sel");
+      selL=null;sOk();if(++done===6)unlock()}
+    else{sNo();b.classList.add("wrong");setTimeout(()=>b.classList.remove("wrong"),350)}});
+}
+
+/* P4: serie vs parallelo interattivo */
+function prac4(lab,unlock,setT,setI){
+  setT("Il banco dei circuiti");
+  setI("Gioca con gli interruttori e completa le due missioni. Osserva la differenza tra serie e parallelo!");
+  lab.innerHTML=`
+   <div class="task" id="t1"><span class="tick">✔</span>Nel circuito in SERIE: apri l'interruttore e osserva che si spengono TUTTE</div>
+   <div class="task" id="t2"><span class="tick">✔</span>Nel circuito in PARALLELO: spegni SOLO la lampada B lasciando accesa la A</div>
+   <div class="circ">
+    <div class="cbox"><h4>SERIE — un solo anello</h4>
+      🔋 <button class="sw" id="s1">S1: CHIUSO</button>
+      <span class="lamp on" id="l1"></span><span class="lamp on" id="l2"></span>
+      <p style="font-size:.75rem;color:var(--dim);font-weight:800;margin-top:8px">Batteria → S1 → L1 → L2 → ritorno</p></div>
+    <div class="cbox"><h4>PARALLELO — un ramo per lampada</h4>
+      🔋 <button class="sw" id="pa">SA: CHIUSO</button><span class="lamp on" id="la"></span><br>
+      🔋 <button class="sw" id="pb">SB: CHIUSO</button><span class="lamp on" id="lb"></span>
+      <p style="font-size:.75rem;color:var(--dim);font-weight:800;margin-top:8px">Ogni lampada ha il suo interruttore</p></div>
+   </div>`;
+  const st={s1:true,pa:true,pb:true,t1:false,t2:false};
+  function paint(){
+    document.getElementById("s1").textContent="S1: "+(st.s1?"CHIUSO":"APERTO");
+    document.getElementById("s1").classList.toggle("off",!st.s1);
+    document.getElementById("l1").classList.toggle("on",st.s1);
+    document.getElementById("l2").classList.toggle("on",st.s1);
+    document.getElementById("pa").textContent="SA: "+(st.pa?"CHIUSO":"APERTO");
+    document.getElementById("pa").classList.toggle("off",!st.pa);
+    document.getElementById("pb").textContent="SB: "+(st.pb?"CHIUSO":"APERTO");
+    document.getElementById("pb").classList.toggle("off",!st.pb);
+    document.getElementById("la").classList.toggle("on",st.pa);
+    document.getElementById("lb").classList.toggle("on",st.pb);
+    if(!st.s1&&!st.t1){st.t1=true;document.getElementById("t1").classList.add("done");sOk()}
+    if(st.pa&&!st.pb&&!st.t2){st.t2=true;document.getElementById("t2").classList.add("done");sOk()}
+    if(st.t1&&st.t2)unlock();}
+  document.getElementById("s1").addEventListener("click",()=>{st.s1=!st.s1;sClick();paint()});
+  document.getElementById("pa").addEventListener("click",()=>{st.pa=!st.pa;sClick();paint()});
+  document.getElementById("pb").addEventListener("click",()=>{st.pb=!st.pb;sClick();paint()});
+  paint();
+}
+
+/* P5: colori dei fili */
+function prac5(lab,unlock,setT,setI){
+  setT("Collega i fili ai morsetti giusti");
+  setI("Tocca un conduttore, poi il morsetto del colore corretto. Un errore qui, nella realtà, costa carissimo.");
+  const wires=[["FASE (porta la tensione)","marrone"],["NEUTRO (il ritorno)","blu"],["TERRA (la via di fuga)","gv"]];
+  const terms=shuffle([["Morsetto MARRONE","marrone","c-marrone"],["Morsetto BLU","blu","c-blu"],["Morsetto GIALLO-VERDE","gv","c-gv"]]);
+  lab.innerHTML=`<div class="wires">
+    <div class="wrow"><div class="col" id="wl" style="display:grid;gap:12px">${wires.map(([t,k])=>
+      `<button class="wr" data-k="${k}">${t}</button>`).join("")}</div>
+    <div class="col" id="wt" style="display:grid;gap:12px">${terms.map(([t,k,c])=>
+      `<button class="wr ${c}" data-k="${k}">${t}</button>`).join("")}</div></div></div>`;
+  let sel=null,done=0;
+  document.getElementById("wl").addEventListener("click",e=>{const b=e.target.closest(".wr");
+    if(!b||b.classList.contains("done"))return;sClick();
+    lab.querySelectorAll("#wl .wr").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");sel=b});
+  document.getElementById("wt").addEventListener("click",e=>{const b=e.target.closest(".wr");
+    if(!b||b.classList.contains("done")||!sel)return;
+    if(b.dataset.k===sel.dataset.k){b.classList.add("done");sel.classList.add("done");sel.classList.remove("sel");
+      sel=null;sOk();if(++done===3)unlock()}
+    else{sNo();b.classList.add("wrong");setTimeout(()=>b.classList.remove("wrong"),350)}});
+}
+
+/* P6: ordina il percorso professionale */
+function prac6(lab,unlock,setT,setI){
+  setT("Costruisci il tuo percorso, passo dopo passo");
+  setI("Tocca le tappe nell'ordine giusto: da studente a elettricista abilitato.");
+  const steps=["Scuola superiore a indirizzo elettrico (o corso professionale)","Laboratorio e primi progetti didattici","Apprendistato in azienda con un elettricista esperto","Qualifiche di sicurezza PES/PAV + esperienza sul campo","Abilitazione D.M. 37/2008: puoi firmare gli impianti"];
+  lab.innerHTML=`<div class="seq" id="seq">${shuffle(steps.map((s,k)=>[s,k])).map(([s,k])=>
+    `<button class="opt" data-k="${k}"><span class="n">?</span>${s}</button>`).join("")}</div>`;
+  let next=0;
+  lab.addEventListener("click",e=>{const b=e.target.closest(".opt");
+    if(!b||b.classList.contains("done"))return;
+    if(+b.dataset.k===next){b.classList.add("done");b.querySelector(".n").textContent=++next;sOk();
+      if(next===5)unlock()}
+    else{sNo();b.classList.add("wrong");setTimeout(()=>b.classList.remove("wrong"),350)}});
+}
+
+/* ---------- QUIZ di modulo ---------- */
+function quiz(i){
+  runQuiz(modHead(i,2),shuffleQuiz(MOD[i].quiz),4,
+    ()=>{S.done[i]=true;save();syncProg();
+      moduleDone(i)},
+    ()=>quiz(i));
+}
+function runQuiz(head,qs,need,onPass,onRetry){
+  let idx=0,score=0;
+  function ask(){
+    const q=qs[idx];
+    app.innerHTML=head+`<div class="panel">
+      <div class="qmeta"><span>DOMANDA ${idx+1} / ${qs.length}</span><span>PUNTEGGIO: ${score}</span></div>
+      <div class="qq">${q.q}</div>
+      <div class="opts">${q.o.map((o,k)=>`<button class="opt" data-k="${k}">${o}</button>`).join("")}</div>
+      <div class="fb" id="fb"></div></div>`;
+    bindBack();
+    let answered=false;
+    app.querySelectorAll(".opt").forEach(b=>b.addEventListener("click",()=>{
+      if(answered)return;answered=true;
+      const k=+b.dataset.k,fb=document.getElementById("fb");
+      app.querySelectorAll(".opt").forEach((x,j)=>{if(j===q.c)x.classList.add("right")});
+      if(k===q.c){score++;sOk();fb.textContent="✔ Esatto!";fb.className="fb ok"}
+      else{b.classList.add("wrong");sNo();fb.textContent="✘ No: la risposta giusta è evidenziata in verde.";fb.className="fb no"}
+      setTimeout(()=>{idx++;idx<qs.length?ask():result()},1300);}));
+  }
+  function result(){
+    const pass=score>=need;
+    app.innerHTML=head+`<div class="panel"><div class="big-result ${pass?"pass":"fail"}">
+      <div class="pct">${score} / ${qs.length}</div>
+      <h3>${pass?"Verifica superata! 🏅":"Non ancora…"}</h3>
+      <p style="color:var(--soft);font-weight:700;margin:10px 0">${pass?"Hai dimostrato di padroneggiare questo modulo.":"Ti servivano almeno "+need+" risposte giuste. Ripassa la lezione e riprova: gli elettricisti non mollano."}</p>
+      <div class="nav-slide" style="justify-content:center">
+        ${pass?'<button class="btn p" id="cont">Continua →</button>':
+          '<button class="btn g" id="bk2">← Ripassa la lezione</button><button class="btn y" id="rt">Riprova la verifica</button>'}
+      </div></div></div>`;
+    bindBack();
+    if(pass){party(140);sBadge();document.getElementById("cont").addEventListener("click",onPass)}
+    else{document.getElementById("rt").addEventListener("click",()=>{sClick();onRetry()});
+      document.getElementById("bk2").addEventListener("click",()=>{sClick();home()})}
+  }
+  ask();
+}
+function moduleDone(i){
+  const nxt=i<5?`Il modulo ${i+2} — <b>${MOD[i+1].tit}</b> — ti aspetta.`:"Hai completato TUTTI i moduli: l'esame finale è sbloccato!";
+  app.innerHTML=modHead(i,2)+`<div class="panel"><div class="big-result pass">
+    <div style="font-size:56px">🏅</div>
+    <h3>Modulo ${i+1} completato!</h3>
+    <p style="color:var(--soft);font-weight:700;margin:10px 0">${nxt}</p>
+    <div class="nav-slide" style="justify-content:center"><button class="btn p" id="hm">Torna al corso →</button></div>
+    </div></div>`;
+  bindBack();party(160);
+  document.getElementById("hm").addEventListener("click",()=>{sClick();home()});
+}
+
+/* ---------- ESAME FINALE ---------- */
+function exam(){
+  const head=`<div class="hd"><button class="back" id="bk">← Corso</button><h2>📜 Esame da Elettricista</h2>
+    <span class="crumb">PROVA FINALE — servono 8 risposte giuste su 10</span></div>`;
+  runQuiz(head,shuffleQuiz(EXAM),8,
+    ()=>{S.exam=true;save();syncProg();diploma(true)},
+    ()=>exam());
+}
+
+/* ---------- DIPLOMA ---------- */
+function diploma(fresh){
+  const head=`<div class="hd"><button class="back" id="bk">← Corso</button><h2>🎓 Il tuo diploma</h2></div>`;
+  if(!S.nome){
+    app.innerHTML=head+`<div class="panel" style="text-align:center">
+      <h3>Un'ultima cosa, futuro collega…</h3>
+      <p style="color:var(--soft);font-weight:700;margin:12px 0">Come ti chiami? Il nome finirà sul diploma.</p>
+      <div class="nameask"><input id="nm" maxlength="40" placeholder="Nome e cognome"></div>
+      <div class="nav-slide" style="justify-content:center"><button class="btn p" id="okN">Stampa il diploma →</button></div></div>`;
+    bindBack();
+    const go=()=>{const v=document.getElementById("nm").value.trim();
+      if(v){S.nome=v;save();diploma(true)}};
+    document.getElementById("okN").addEventListener("click",go);
+    document.getElementById("nm").addEventListener("keydown",e=>{if(e.key==="Enter")go()});
+    document.getElementById("nm").focus();
+    return;
+  }
+  const d=new Date(),data=d.toLocaleDateString("it-IT",{day:"numeric",month:"long",year:"numeric"});
+  app.innerHTML=head+`<div class="diploma">
+    <div class="sigil">⚡🎓⚡</div>
+    <h2>DIPLOMA DEL CORSO<br>DI ELETTRICISTA</h2>
+    <p>La Scuola dell'Elettricista certifica che</p>
+    <div class="nome">${S.nome.replace(/[<>&]/g,"")}</div>
+    <p>ha completato con successo tutti i 6 moduli del corso — basi dell'elettricità, sicurezza, attrezzi, circuiti, impianto domestico e percorso professionale — e ha superato l'esame finale.</p>
+    <p><b>Prossima fermata: la scuola vera, l'apprendistato e la qualifica.</b> Il mondo funziona a corrente — e ora sai da dove si comincia per domarla.</p>
+    <div class="data">RILASCIATO IL ${data.toUpperCase()} · VALIDO COME PRIMO PASSO, NON COME ABILITAZIONE 😉</div>
+   </div>
+   <div class="nav-slide" style="justify-content:center;margin-top:18px">
+    <button class="btn p" id="hm">← Torna al corso</button>
+    <button class="btn g" id="rst">Ricomincia da zero</button></div>`;
+  bindBack();
+  if(fresh){party(260);sBadge()}
+  document.getElementById("hm").addEventListener("click",()=>{sClick();home()});
+  document.getElementById("rst").addEventListener("click",()=>{
+    S={done:[false,false,false,false,false,false],exam:false,nome:""};save();syncProg();home()});
+}
+
+home();
+})();
+</script>
+<script>document.addEventListener("contextmenu",function(e){if(e.target&&e.target.tagName==="CANVAS")e.preventDefault()});</script>
+<a class="pgai-back" href="../index.html" aria-label="Torna a PlaygroundAI">&#9666; PlaygroundAI</a>
+<script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("/sw.js"))</script>
+</body>
+</html>

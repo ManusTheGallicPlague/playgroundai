@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="it">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Combina gli elementi e scopri 103 invenzioni all'italiana. Crafting puro. Gioca gratis su PlaygroundAI.">
+<meta name="theme-color" content="#0a0d18">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3368917580765134" crossorigin="anonymous"></script>
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
+<title>Alchimia dello Stivale</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grandstander:wght@600;800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@700&display=swap">
+
+<style>
+:root{
+  --parch:#f5ecd7; --panel:#fdf8ea; --line:#e2d5b0;
+  --ink:#3c3222; --dim:#9a8b6b;
+  --vio:#7a5bb5; --gold:#d9a02e; --ok:#5f9a56; --bad:#c65b45;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:
+    radial-gradient(900px 500px at 20% -10%, #fbf4e2 0%, transparent 60%),
+    radial-gradient(700px 500px at 100% 110%, #ece0f2 0%, transparent 50%),
+    var(--parch);
+  color:var(--ink);font-family:"Atkinson Hyperlegible",system-ui,sans-serif;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;padding:12px;overflow:hidden;
+}
+.head{width:min(1080px,98vw);display:flex;align-items:flex-end;gap:16px}
+.logo{font-family:"Grandstander",cursive;font-weight:800;font-size:27px;line-height:1;
+  color:var(--vio)}
+.sub{font-size:11px;color:var(--dim);padding-bottom:3px}
+.prog{margin-left:auto;display:flex;align-items:center;gap:12px}
+.prog .n{font-family:"JetBrains Mono",monospace;font-size:18px;font-weight:700}
+.prog .n b{color:var(--vio)}
+.bar{width:180px;height:10px;border-radius:99px;background:#e6dabb;overflow:hidden;
+  border:1.5px solid var(--line)}
+.bar i{display:block;height:100%;width:0;border-radius:99px;
+  background:linear-gradient(90deg,var(--gold),var(--vio));transition:width .4s}
+
+.wrap{width:min(1080px,98vw);display:flex;gap:10px;height:min(74vh,590px)}
+.board{position:relative;flex:1;border-radius:14px;overflow:hidden;
+  background:
+    radial-gradient(600px 400px at 50% 40%, #fbf5e6 0%, #f1e6cb 100%);
+  border:2.5px solid var(--line);box-shadow:inset 0 0 60px rgba(140,110,60,.12),
+    0 18px 44px rgba(90,70,40,.18)}
+.board .wm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:"Grandstander",cursive;font-size:20px;color:#c9b98f;pointer-events:none;
+  text-align:center;line-height:1.6}
+.trash{position:absolute;right:12px;bottom:12px;width:56px;height:56px;border-radius:14px;
+  border:2px dashed var(--line);display:flex;align-items:center;justify-content:center;
+  font-size:24px;color:var(--dim);transition:background .15s,border-color .15s;z-index:3}
+.trash.hot{background:#fde3dc;border-color:var(--bad)}
+.clear{position:absolute;left:12px;bottom:12px;z-index:3;
+  font-family:"Atkinson Hyperlegible",sans-serif;font-weight:700;font-size:11px;
+  letter-spacing:1px;padding:8px 14px;border-radius:99px;border:2px solid var(--line);
+  background:#fff9;cursor:pointer;color:var(--dim)}
+.clear:hover{border-color:var(--vio);color:var(--vio)}
+
+.inst{position:absolute;display:flex;flex-direction:column;align-items:center;gap:1px;
+  padding:8px 12px 6px;border-radius:13px;background:#fff;cursor:grab;user-select:none;
+  border:2px solid var(--line);box-shadow:0 4px 10px rgba(90,70,40,.18);z-index:2;
+  transition:box-shadow .12s}
+.inst:active{cursor:grabbing}
+.inst.drag{z-index:6;box-shadow:0 12px 26px rgba(90,70,40,.35);transform:scale(1.06)}
+.inst.glow{border-color:var(--vio);box-shadow:0 0 0 3px #7a5bb544,0 8px 18px rgba(90,70,40,.3)}
+.inst .e{font-size:26px;line-height:1;pointer-events:none}
+.inst .n{font-size:10px;font-weight:700;pointer-events:none;white-space:nowrap}
+.inst.shake{animation:shk .35s}
+@keyframes shk{25%{transform:translateX(5px) rotate(2deg)}
+  55%{transform:translateX(-6px) rotate(-2deg)}85%{transform:translateX(3px)}}
+.pop{position:absolute;pointer-events:none;z-index:7;
+  font-family:"Grandstander",cursive;font-weight:800;color:var(--vio);
+  animation:pp 1s ease-out forwards}
+@keyframes pp{0%{opacity:0;transform:scale(.5)}25%{opacity:1;transform:scale(1.15)}
+  70%{opacity:1}100%{opacity:0;transform:translateY(-26px) scale(1)}}
+
+.lib{width:296px;display:flex;flex-direction:column;gap:8px;
+  background:var(--panel);border:2.5px solid var(--line);border-radius:14px;
+  padding:11px;box-shadow:0 18px 44px rgba(90,70,40,.14)}
+.lib input{border:2px solid var(--line);border-radius:9px;padding:8px 12px;
+  font-family:"Atkinson Hyperlegible",sans-serif;font-size:13px;background:#fff;
+  color:var(--ink);outline:none}
+.lib input:focus{border-color:var(--vio)}
+.items{flex:1;overflow-y:auto;display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;
+  padding:2px}
+.it{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:99px;
+  background:#fff;border:2px solid var(--line);cursor:pointer;font-size:12px;font-weight:700;
+  transition:transform .1s,border-color .12s}
+.it:hover{transform:translateY(-2px);border-color:var(--vio)}
+.it.new{border-color:var(--gold);background:#fdf3da}
+.it .e{font-size:16px}
+.hintbox{border-top:2px dashed var(--line);padding-top:8px;display:flex;
+  flex-direction:column;gap:6px}
+.hintbox .ht{font-size:12px;line-height:1.5;color:var(--dim);min-height:18px}
+.hintbox .ht b{color:var(--ink)}
+button.hint{border:0;border-radius:9px;padding:10px;cursor:pointer;
+  font-family:"Grandstander",cursive;font-weight:800;font-size:13px;
+  background:var(--vio);color:#fff;transition:filter .15s}
+button.hint:hover:not(:disabled){filter:brightness(1.1)}
+button.hint:disabled{opacity:.45;cursor:default}
+
+.ov{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:16px;text-align:center;padding:30px;
+  background:rgba(245,236,215,.96);z-index:20}
+.ov.hide{display:none}
+.ov h2{font-family:"Grandstander",cursive;font-weight:800;
+  font-size:clamp(26px,4.4vw,42px);line-height:1.15;color:var(--vio);text-wrap:balance}
+.ov p{max-width:52ch;font-size:14px;line-height:1.7;color:#7a6c50}
+.ov button.hint{font-size:15px;padding:13px 32px}
+.foot{width:min(1080px,98vw);font-size:11px;color:var(--dim)}
+
+html,body{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.pgai-back{position:fixed;bottom:12px;right:12px;z-index:999;font-family:system-ui,sans-serif;font-weight:700;font-size:12px;color:#fff;background:rgba(15,17,28,.78);border:1px solid rgba(255,255,255,.28);padding:8px 13px;border-radius:99px;text-decoration:none;backdrop-filter:blur(6px)}
+.pgai-back:hover{background:rgba(70,80,120,.85)}
+@media (max-width:700px){body{overflow:auto;height:auto;min-height:100vh}.head{flex-wrap:wrap;gap:8px}.hud{margin-left:0;width:100%;justify-content:space-between;flex-wrap:wrap;gap:8px}.foot{flex-wrap:wrap;gap:8px}}
+.it,.pop,.inst{touch-action:none}
+@media (max-width:800px){.wrap,.room,.main,.lab{flex-direction:column}}
+</style>
+
+<div class="head">
+  <div>
+    <div class="logo">Alchimia dello Stivale</div>
+    <div class="sub">da quattro elementi, un mondo intero</div>
+  </div>
+  <div class="prog">
+    <div class="bar"><i id="pBar"></i></div>
+    <div class="n"><b id="pN">4</b>/<span id="pT">?</span></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="board" id="board">
+    <div class="wm" id="wm">trascina un elemento<br>sopra un altro</div>
+    <button class="clear" id="btnClear">pulisci il banco</button>
+    <div class="trash" id="trash">🗑️</div>
+  </div>
+  <div class="lib">
+    <input id="search" type="search" placeholder="cerca tra gli elementi…">
+    <div class="items" id="items"></div>
+    <div class="hintbox">
+      <div class="ht" id="hintTxt">Bloccato? Un suggerimento ogni 45 secondi.</div>
+      <button class="hint" id="btnHint">💡 Suggerimento</button>
+    </div>
+  </div>
+</div>
+
+<div class="foot">clicca un elemento in libreria per metterlo sul banco · trascina un elemento sull'altro per combinarli · doppio clic (o cestino) per togliere · il progresso si salva da solo</div>
+
+<div class="ov hide" id="ovWin">
+  <h2>Hai ricreato il mondo intero 🏆</h2>
+  <p id="winTxt">—</p>
+  <button class="hint" id="btnReset">Ricomincia da quattro elementi</button>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const board=$('board');
+
+/* ---------- audio ---------- */
+let ac=null,muted=false;
+function tone(f,d,type,v,to){
+  try{
+    ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+    if(ac.state==='suspended')ac.resume();
+  }catch(e){return}
+  if(muted)return;
+  const t=ac.currentTime,o=ac.createOscillator(),g=ac.createGain();
+  o.type=type||'sine';o.frequency.setValueAtTime(f,t);
+  if(to)o.frequency.exponentialRampToValueAtTime(Math.max(40,to),t+d);
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(v||0.05,t+0.008);
+  g.gain.exponentialRampToValueAtTime(0.0006,t+d);
+  o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+d+0.05);
+}
+const sNew=()=>[523,659,784,1046].forEach((f,k)=>setTimeout(()=>tone(f,0.35,'triangle',0.07),k*80));
+const sOld=()=>tone(700,0.12,'triangle',0.05);
+const sNo=()=>tone(180,0.18,'sawtooth',0.04,90);
+const sPick=()=>tone(900,0.05,'square',0.02);
+const sTrash=()=>tone(300,0.12,'sine',0.04,120);
+
+/* ---------- elementi ---------- */
+const E={
+acqua:['Acqua','💧','base'],fuoco:['Fuoco','🔥','base'],terra:['Terra','🌍','base'],aria:['Aria','🌬️','base'],
+vapore:['Vapore','♨️'],fango:['Fango','🟤'],nuvola:['Nuvola','☁️'],lava:['Lava','🟠'],
+energia:['Energia','⚡'],sabbia:['Sabbia','🟡'],montagna:['Montagna','⛰️'],mare:['Mare','🌊'],
+cielo:['Cielo','🌌'],pioggia:['Pioggia','🌧️'],pietra:['Pietra','🪨'],sole:['Sole','☀️'],
+vento:['Vento','🌪️'],pianta:['Pianta','🌱'],vita:['Vita','✨'],ghiaccio:['Ghiaccio','🧊'],
+neve:['Neve','❄️'],tempesta:['Tempesta','⛈️'],fulmine:['Fulmine','🌩️'],arcobaleno:['Arcobaleno','🌈'],
+argilla:['Argilla','🏺'],uomo:['Uomo','🧑'],albero:['Albero','🌳'],animale:['Animale','🐾'],
+pesce:['Pesce','🐟'],uccello:['Uccello','🐦'],utensile:['Utensile','🔨'],legno:['Legno','🪵'],
+metallo:['Metallo','⚙️'],vetro:['Vetro','🪟'],carbone:['Carbone','⚫'],elettricita:['Elettricità','🔌'],
+lampadina:['Lampadina','💡'],mattone:['Mattone','🧱'],muro:['Muro','🚧'],casa:['Casa','🏠'],
+villaggio:['Villaggio','🏘️'],citta:['Città','🏙️'],torre:['Torre','🗼'],ruota:['Ruota','🛞'],
+carta:['Carta','📄'],libro:['Libro','📖'],tempo:['Tempo','⌛'],notte:['Notte','🌑'],
+stella:['Stella','⭐'],luna:['Luna','🌙'],grano:['Grano','🌾'],pomodoro:['Pomodoro','🍅'],
+vigna:['Vigna','🍇'],farina:['Farina','🍚'],impasto:['Impasto','🫓'],pane:['Pane','🍞'],
+pizza:['Pizza','🍕'],pasta:['Pasta','🍝'],mucca:['Mucca','🐄'],latte:['Latte','🥛'],
+formaggio:['Formaggio','🧀'],burro:['Burro','🧈'],cornetto:['Cornetto','🥐'],caffe:['Caffè','☕'],
+tiramisu:['Tiramisù','🍰'],gelato:['Gelato','🍨'],vino:['Vino','🍷'],sale:['Sale','🧂'],
+spiaggia:['Spiaggia','🏖️'],vulcano:['Vulcano','🌋'],isola:['Isola','🏝️'],conchiglia:['Conchiglia','🐚'],
+perla:['Perla','⚪'],polpo:['Polpo','🐙'],balena:['Balena','🐋'],cane:['Cane','🐕'],
+gatto:['Gatto','🐈'],cavallo:['Cavallo','🐎'],drago:['Drago','🐉'],fantasma:['Fantasma','👻'],
+golem:['Golem','🗿'],robot:['Robot','🤖'],computer:['Computer','💻'],motore:['Motore','🚂'],
+bicicletta:['Bicicletta','🚲'],vespa:['Vespa','🛵'],automobile:['Automobile','🚗'],barca:['Barca','⛵'],
+nave:['Nave','🚢'],aereo:['Aereo','✈️'],razzo:['Razzo','🚀'],musica:['Musica','🎵'],
+violino:['Violino','🎻'],amore:['Amore','❤️'],famiglia:['Famiglia','👨‍👩‍👧'],colosseo:['Colosseo','🏛️'],
+deserto:['Deserto','🐪'],cactus:['Cactus','🌵'],fuochi:['Fuochi d\'artificio','🎆'],
+spada:['Spada','🗡️'],castello:['Castello','🏰'],re:['Re','👑'],nebbia:['Nebbia','🌫️']
+};
+const R=[
+['acqua','fuoco','vapore'],['acqua','terra','fango'],['acqua','aria','nuvola'],
+['fuoco','terra','lava'],['fuoco','aria','energia'],['terra','aria','sabbia'],
+['terra','terra','montagna'],['acqua','acqua','mare'],['aria','aria','cielo'],
+['nuvola','acqua','pioggia'],['lava','acqua','pietra'],['cielo','fuoco','sole'],
+['aria','energia','vento'],['pioggia','terra','pianta'],['energia','fango','vita'],
+['acqua','montagna','ghiaccio'],['pioggia','montagna','neve'],['nuvola','energia','tempesta'],
+['tempesta','energia','fulmine'],['pioggia','sole','arcobaleno'],['fango','sabbia','argilla'],
+['vita','argilla','uomo'],['pianta','pianta','albero'],['vita','terra','animale'],
+['vita','mare','pesce'],['vita','aria','uccello'],['uomo','pietra','utensile'],
+['albero','utensile','legno'],['pietra','fuoco','metallo'],['sabbia','fuoco','vetro'],
+['legno','fuoco','carbone'],['energia','metallo','elettricita'],['elettricita','vetro','lampadina'],
+['argilla','fuoco','mattone'],['mattone','mattone','muro'],['muro','legno','casa'],
+['casa','casa','villaggio'],['villaggio','villaggio','citta'],['muro','muro','torre'],
+['legno','pietra','ruota'],['legno','utensile','carta'],['carta','uomo','libro'],
+['sabbia','vetro','tempo'],['cielo','tempo','notte'],['notte','fuoco','stella'],
+['notte','pietra','luna'],['pianta','sole','grano'],['pianta','uomo','pomodoro'],
+['albero','uomo','vigna'],['grano','pietra','farina'],['farina','acqua','impasto'],
+['impasto','fuoco','pane'],['impasto','pomodoro','pizza'],['impasto','utensile','pasta'],
+['animale','grano','mucca'],['mucca','uomo','latte'],['latte','tempo','formaggio'],
+['latte','utensile','burro'],['impasto','burro','cornetto'],['pianta','fuoco','caffe'],
+['caffe','formaggio','tiramisu'],['latte','ghiaccio','gelato'],['vigna','tempo','vino'],
+['mare','sole','sale'],['sabbia','mare','spiaggia'],['montagna','lava','vulcano'],
+['mare','vulcano','isola'],['mare','pietra','conchiglia'],['conchiglia','tempo','perla'],
+['mare','animale','polpo'],['pesce','montagna','balena'],['animale','uomo','cane'],
+['animale','casa','gatto'],['animale','vento','cavallo'],['animale','fuoco','drago'],
+['vita','notte','fantasma'],['pietra','vita','golem'],['metallo','elettricita','robot'],
+['robot','libro','computer'],['vapore','metallo','motore'],['ruota','metallo','bicicletta'],
+['bicicletta','motore','vespa'],['motore','ruota','automobile'],['legno','mare','barca'],
+['barca','metallo','nave'],['metallo','uccello','aereo'],['aereo','fuoco','razzo'],
+['uccello','uomo','musica'],['musica','legno','violino'],['uomo','uomo','amore'],
+['amore','casa','famiglia'],['citta','tempo','colosseo'],['sabbia','sole','deserto'],
+['deserto','pianta','cactus'],['razzo','energia','fuochi'],['metallo','utensile','spada'],
+['torre','torre','castello'],['castello','uomo','re'],['nuvola','terra','nebbia']
+];
+const RMAP={};
+for(const [a,b,c] of R)RMAP[[a,b].sort().join('+')]=c;
+const TOTAL=Object.keys(E).length;
+$('pT').textContent=TOTAL;
+
+/* ---------- stato ---------- */
+let disc=new Set(['acqua','fuoco','terra','aria']);
+try{const sv=JSON.parse(localStorage.getItem('alchimiaSave')||'null');
+  if(sv&&Array.isArray(sv))sv.forEach(x=>{if(E[x])disc.add(x)})}catch(e){}
+const save=()=>localStorage.setItem('alchimiaSave',JSON.stringify([...disc]));
+let fresh=new Set();
+let madeBy={};   // come l'hai scoperto (per il tooltip)
+
+/* ---------- libreria ---------- */
+function renderLib(){
+  const q=($('search').value||'').toLowerCase();
+  const box=$('items');box.innerHTML='';
+  [...disc].map(id=>({id,n:E[id][0],e:E[id][1]}))
+    .sort((a,b)=>a.n.localeCompare(b.n,'it'))
+    .filter(x=>!q||x.n.toLowerCase().includes(q))
+    .forEach(x=>{
+      const d=document.createElement('button');
+      d.className='it'+(fresh.has(x.id)?' new':'');
+      d.innerHTML='<span class="e">'+x.e+'</span>'+x.n;
+      if(madeBy[x.id])d.title=madeBy[x.id];
+      d.addEventListener('click',()=>{spawn(x.id);fresh.delete(x.id);d.classList.remove('new')});
+      box.appendChild(d);
+    });
+  $('pN').textContent=disc.size;
+  $('pBar').style.width=(disc.size/TOTAL*100)+'%';
+}
+$('search').addEventListener('input',renderLib);
+
+/* ---------- banco ---------- */
+let drag=null;
+function spawn(id,x,y){
+  sPick();
+  const d=document.createElement('div');
+  d.className='inst';d.dataset.id=id;
+  d.innerHTML='<span class="e">'+E[id][1]+'</span><span class="n">'+E[id][0]+'</span>';
+  const br=board.getBoundingClientRect();
+  const px=x!==undefined?x:40+Math.random()*(br.width-160);
+  const py=y!==undefined?y:40+Math.random()*(br.height-140);
+  d.style.left=px+'px';d.style.top=py+'px';
+  d.addEventListener('pointerdown',ev=>{
+    ev.preventDefault();
+    drag={el:d,ox:ev.clientX-d.offsetLeft,oy:ev.clientY-d.offsetTop};
+    d.classList.add('drag');d.setPointerCapture(ev.pointerId);
+  });
+  d.addEventListener('dblclick',()=>{d.remove();sTrash();wm()});
+  board.appendChild(d);
+  wm();
+  return d;
+}
+addEventListener('pointermove',ev=>{
+  if(!drag)return;
+  const br=board.getBoundingClientRect();
+  let x=ev.clientX-drag.ox, y=ev.clientY-drag.oy;
+  x=Math.max(2,Math.min(br.width-drag.el.offsetWidth-2,x));
+  y=Math.max(2,Math.min(br.height-drag.el.offsetHeight-2,y));
+  drag.el.style.left=x+'px';drag.el.style.top=y+'px';
+  const over=findOver(drag.el);
+  document.querySelectorAll('.inst.glow').forEach(z=>z.classList.remove('glow'));
+  if(over)over.classList.add('glow');
+  $('trash').classList.toggle('hot',overTrash(drag.el));
+});
+addEventListener('pointerup',()=>{
+  if(!drag)return;
+  const el=drag.el;drag=null;
+  el.classList.remove('drag');
+  document.querySelectorAll('.inst.glow').forEach(z=>z.classList.remove('glow'));
+  if(overTrash(el)){el.remove();sTrash();$('trash').classList.remove('hot');wm();return}
+  const over=findOver(el);
+  if(over)combine(el,over);
+});
+function rectOf(el){return {x:el.offsetLeft,y:el.offsetTop,w:el.offsetWidth,h:el.offsetHeight}}
+function findOver(el){
+  const a=rectOf(el);
+  for(const o of board.querySelectorAll('.inst')){
+    if(o===el)continue;
+    const b=rectOf(o);
+    if(a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y)return o;
+  }
+  return null;
+}
+function overTrash(el){
+  const t=$('trash'),a=rectOf(el);
+  const b={x:t.offsetLeft,y:t.offsetTop,w:t.offsetWidth,h:t.offsetHeight};
+  return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
+}
+function combine(a,b){
+  const key=[a.dataset.id,b.dataset.id].sort().join('+');
+  const res=RMAP[key];
+  if(!res){
+    sNo();
+    a.classList.add('shake');b.classList.add('shake');
+    setTimeout(()=>{a.classList.remove('shake');b.classList.remove('shake')},380);
+    return;
+  }
+  const x=(a.offsetLeft+b.offsetLeft)/2, y=(a.offsetTop+b.offsetTop)/2;
+  const recipe=E[a.dataset.id][1]+' + '+E[b.dataset.id][1];
+  a.remove();b.remove();
+  const inst=spawn(res,x,y);
+  const isNew=!disc.has(res);
+  if(isNew){
+    disc.add(res);fresh.add(res);
+    madeBy[res]='Nato da: '+recipe;
+    save();sNew();
+    const p=document.createElement('div');
+    p.className='pop';p.style.left=x+'px';p.style.top=(y-34)+'px';
+    p.style.fontSize='16px';
+    p.textContent='✨ Nuovo: '+E[res][0]+'!';
+    board.appendChild(p);setTimeout(()=>p.remove(),1000);
+    renderLib();
+    if(disc.size>=TOTAL)win();
+  }else{
+    sOld();
+    const p=document.createElement('div');
+    p.className='pop';p.style.left=x+'px';p.style.top=(y-28)+'px';
+    p.style.fontSize='13px';p.style.color='#9a8b6b';
+    p.textContent=E[res][0];
+    board.appendChild(p);setTimeout(()=>p.remove(),1000);
+  }
+  inst.classList.add('glow');setTimeout(()=>inst.classList.remove('glow'),600);
+}
+function wm(){$('wm').style.display=board.querySelectorAll('.inst').length?'none':'flex'}
+$('btnClear').addEventListener('click',()=>{
+  board.querySelectorAll('.inst').forEach(x=>x.remove());sTrash();wm();
+});
+
+/* ---------- suggerimenti ---------- */
+let hintCd=0;
+setInterval(()=>{if(hintCd>0){hintCd--;
+  if(hintCd===0)$('btnHint').disabled=false;
+  else $('btnHint').textContent='💡 tra '+hintCd+'s';
+  if(hintCd===0)$('btnHint').textContent='💡 Suggerimento';
+}},1000);
+$('btnHint').addEventListener('click',()=>{
+  const cands=R.filter(([a,b,c])=>disc.has(a)&&disc.has(b)&&!disc.has(c));
+  if(!cands.length){$('hintTxt').innerHTML='Niente da suggerire: serve prima scoprire altro.';return}
+  const [a,b]=cands[(Math.random()*cands.length)|0];
+  $('hintTxt').innerHTML='Prova a unire <b>'+E[a][1]+' '+E[a][0]+'</b> con <b>qualcos\'altro che hai già…</b>'+
+    (Math.random()<0.5?'':' (inizia per "'+E[b][0][0]+'")');
+  hintCd=45;$('btnHint').disabled=true;
+});
+
+/* ---------- vittoria ---------- */
+function win(){
+  $('winTxt').textContent='Tutti i '+TOTAL+' elementi scoperti: dall\'acqua al tiramisù, dal fango al razzo. L\'alchimista dello Stivale sei tu.';
+  $('ovWin').classList.remove('hide');
+}
+$('btnReset').addEventListener('click',()=>{
+  localStorage.removeItem('alchimiaSave');location.reload();
+});
+
+/* ---------- avvio ---------- */
+renderLib();
+['acqua','fuoco','terra','aria'].forEach((id,i)=>{
+  setTimeout(()=>spawn(id,90+i*110,120+(i%2)*90),i*120);
+});
+})();
+</script>
+<script>document.addEventListener("contextmenu",function(e){if(e.target&&e.target.tagName==="CANVAS")e.preventDefault()});</script>
+<a class="pgai-back" href="../index.html" aria-label="Torna a PlaygroundAI">&#9666; PlaygroundAI</a>
+<script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("/sw.js"))</script>
