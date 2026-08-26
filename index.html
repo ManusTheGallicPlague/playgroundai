@@ -4,7 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3368917580765134" crossorigin="anonymous"></script>
-<link rel="manifest" href="/manifest.json">\n<link rel="apple-touch-icon" href="/apple-touch-icon.png">\n<link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>\n<title>PlaygroundAI</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
+<link rel="preload" as="image" href="/assets/playground-hero-v1.png" fetchpriority="high">
+<title>PlaygroundAI</title>
 <meta name="description" content="Sei giochi browser gratuiti, senza download: strategia, memoria, riflessi e rage game. Aperti dal telefono o dal PC, si gioca subito.">
 <meta property="og:title" content="PlaygroundAI — giochi browser gratis">
 <meta property="og:description" content="Sei giochi senza download: tower defense, memoria, riflessi e rage game. Gioca subito.">
@@ -62,7 +66,8 @@ header nav a{text-decoration:none;transition:color .15s}
 header nav a:hover{color:var(--ink)}
 
 /* ---- hero ---- */
-.hero{padding:44px 0 8px;text-align:left;max-width:720px}
+.hero{min-height:520px;padding:35px 0 8px;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(380px,.95fr);align-items:center;gap:8px;text-align:left}
+.hero-copy{position:relative;z-index:2}
 .hero h1{font-family:"Unbounded",sans-serif;font-weight:900;line-height:1.08;
   font-size:clamp(28px,5.6vw,52px);letter-spacing:.5px;text-wrap:balance}
 .hero h1 em{font-style:normal;color:var(--gold);text-shadow:0 0 30px #ffd16644}
@@ -77,6 +82,11 @@ header nav a:hover{color:var(--ink)}
 .btn:active{transform:translateY(2px)}
 .chips{margin-top:22px;display:flex;gap:8px;flex-wrap:wrap;font-size:11.5px;font-weight:700;color:var(--dim)}
 .chips span{border:1px solid var(--line);border-radius:99px;padding:5px 12px}
+.hero-art{position:relative;min-height:480px;display:grid;place-items:center;margin-right:-52px;isolation:isolate}
+.hero-art::before{content:"";position:absolute;z-index:-1;width:86%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#5ce8ff24 0,#b78cff18 38%,#ff2fb90b 58%,transparent 72%);filter:blur(13px)}
+.hero-art::after{content:"";position:absolute;z-index:-1;width:76%;height:34%;bottom:3%;border-radius:50%;background:#000;filter:blur(35px);opacity:.52}
+.hero-art img{display:block;width:min(585px,116%);max-width:none;height:auto;filter:drop-shadow(0 26px 34px #00000088);animation:hero-float 6s ease-in-out infinite;transform-origin:50% 70%}
+@keyframes hero-float{0%,100%{transform:translateY(0) rotate(-.35deg)}50%{transform:translateY(-10px) rotate(.35deg)}}
 
 /* ---- griglia giochi ---- */
 .games{padding:34px 0 10px}
@@ -116,13 +126,16 @@ footer .dot{opacity:.4}
 footer .right{margin-left:auto}
 @media (max-width:700px){
   header nav{display:none}
-  .hero{padding-top:26px}
+  .hero{min-height:0;padding-top:26px;grid-template-columns:1fr;gap:8px}
+  .hero-art{min-height:0;margin:15px -4vw -4px}
+  .hero-art img{width:min(560px,100%)}
   footer{flex-direction:column;align-items:flex-start;gap:8px}
   footer .right{margin-left:0}
 }
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   .g:hover{transform:none}
+  .hero-art img{animation:none}
 }
 </style>
 </head>
@@ -145,14 +158,19 @@ footer .right{margin-left:auto}
     </header>
 
     <section class="hero">
-      <h1>Sei giochi.<br>Zero download.<br><em>Un browser.</em></h1>
-      <p>Strategia, memoria, riflessi e rabbia pura — tutto gratis, tutto istantaneo, dal telefono o dal PC. Niente app da installare, niente account: tocchi e giochi.</p>
-      <div class="cta">
-        <a class="btn gold" href="#giochi">GIOCA SUBITO ▸</a>
-        <a class="btn ghost" href="#chi-siamo">che cos'è?</a>
+      <div class="hero-copy">
+        <h1>Sei giochi.<br>Zero download.<br><em>Un browser.</em></h1>
+        <p>Strategia, memoria, riflessi e rabbia pura — tutto gratis, tutto istantaneo, dal telefono o dal PC. Niente app da installare, niente account: tocchi e giochi.</p>
+        <div class="cta">
+          <a class="btn gold" href="#giochi">GIOCA SUBITO ▸</a>
+          <a class="btn ghost" href="#chi-siamo">che cos'è?</a>
+        </div>
+        <div class="chips">
+          <span>📱 mobile friendly</span><span>💾 record salvati</span><span>🔊 audio sintetizzato</span><span>🇮🇹 in italiano</span>
+        </div>
       </div>
-      <div class="chips">
-        <span>📱 mobile friendly</span><span>💾 record salvati</span><span>🔊 audio sintetizzato</span><span>🇮🇹 in italiano</span>
+      <div class="hero-art" aria-hidden="true">
+        <img src="/assets/playground-hero-v1.png" width="1100" height="962" alt="" loading="eager" fetchpriority="high">
       </div>
     </section>
 
