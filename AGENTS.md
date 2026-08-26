@@ -41,3 +41,8 @@ Statico puro: niente build, niente framework, niente dipendenze. Quello che c'è
 
 ## Copia di test interna
 - Sulla N40 (rete interna) gira una copia in Docker su :8090 — è solo uno specchio manuale, non fa parte del deploy. Il canale ufficiale è il push su main.
+
+## Immagini e coordinamento (aggiunto 26/08 dopo il redesign)
+- **Immagini sempre in WebP** (quality ~82, max 1200px di lato lungo, idealmente < 150 KB l'una). Niente PNG da 700 KB+ in produzione: il sito deve restare sotto il mezzo MB totale.
+- Sul repo lavorano più agenti: **`git pull --rebase` prima di ogni push**. Non forzare mai il push.
+- La cartella `assets/` può contenere artwork per home e anteprime giochi; i giochi restano comunque file singoli senza asset esterni.
