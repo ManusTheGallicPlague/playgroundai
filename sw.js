@@ -1,6 +1,6 @@
-const V="pgai-v2";
+const V="pgai-v3";
 const CORE=["/","/index.html","/privacy.html","/manifest.json",
- "/games/bastione.html","/games/eco.html","/games/microlabirinto.html",
+ "/games/bastione.html","/games/bastione2.html","/games/eco.html","/games/microlabirinto.html",
  "/games/palazzo.html","/games/skibidi.html","/games/sisifo.html","/games/blocky.html","/games/elettricista.html","/games/alchimia.html","/games/campanile.html","/games/fruttivendolo.html","/games/par.html"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()))});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==V&&k!=="pgai-fonts").map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
